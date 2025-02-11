@@ -1,3 +1,4 @@
+// This file is currently unused
 import { generateFeedback } from "~/lib/feedback";
 
 export default defineEventHandler(async event => {

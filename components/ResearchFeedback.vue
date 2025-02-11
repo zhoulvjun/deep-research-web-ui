@@ -1,7 +1,5 @@
 <script setup lang="ts">
-  import { parsePartialJson } from '@ai-sdk/ui-utils'
-  import { useChat } from '@ai-sdk/vue'
-  import { isObject } from '@vueuse/core'
+  import { generateFeedback } from '~/lib/feedback'
 
   export interface ResearchFeedbackResult {
     assistantQuestion: string
@@ -18,9 +16,8 @@
 
   const feedback = ref<ResearchFeedbackResult[]>([])
 
-  const { messages, input, error, handleSubmit, isLoading } = useChat({
-    api: '/api/generate-feedback',
-  })
+  const isLoading = ref(false)
+  const error = ref('')
 
   const isSubmitButtonDisabled = computed(
     () =>
@@ -34,67 +31,37 @@
 
   async function getFeedback(query: string, numQuestions = 3) {
     clear()
-    // Set input value. (This only makes sure that the library sends the request)
-    input.value = query
-    handleSubmit(
-      {},
-      {
-        body: {
-          query,
-          numQuestions,
-        },
-      },
-    )
-  }
-  function clear() {
-    messages.value = []
-    input.value = ''
-    error.value = undefined
-    feedback.value = []
-  }
-
-  watch(messages, (m) => {
-    const assistantMessage = m[m.length - 1]
-    if (assistantMessage?.role !== 'assistant') {
-      return {
-        value: undefined,
-        state: 'undefined-input',
-      }
-    }
-
-    const content = removeJsonMarkdown(assistantMessage.content)
-    // Write the questions into modelValue
-    const parseResult = parsePartialJson(content)
-
-    if (parseResult.state === 'repaired-parse' || parseResult.state === 'successful-parse') {
-      if (!isObject(parseResult.value) || Array.isArray(parseResult.value)) {
-        return (feedback.value = [])
-      }
-      const unsafeQuestions = parseResult.value.questions
-      if (!unsafeQuestions || !Array.isArray(unsafeQuestions)) return (feedback.value = [])
-
-      const questions = unsafeQuestions.filter((s) => typeof s === 'string')
-      // Incrementally update modelValue
-      for (let i = 0; i < questions.length; i += 1) {
-        if (feedback.value[i]) {
-          feedback.value[i].assistantQuestion = questions[i]
-        } else {
-          feedback.value.push({
-            assistantQuestion: questions[i],
-            userAnswer: '',
-          })
+    isLoading.value = true
+    try {
+      for await (const f of generateFeedback({
+        query,
+        numQuestions,
+      })) {
+        const questions = f.questions!.filter((s) => typeof s === 'string')
+        // Incrementally update modelValue
+        for (let i = 0; i < questions.length; i += 1) {
+          if (feedback.value[i]) {
+            feedback.value[i].assistantQuestion = questions[i]
+          } else {
+            feedback.value.push({
+              assistantQuestion: questions[i],
+              userAnswer: '',
+            })
+          }
         }
       }
-    } else {
-      feedback.value = []
+    } catch (e: any) {
+      console.error('Error getting feedback:', e)
+      error.value = e.message
+    } finally {
+      isLoading.value = false
     }
-  })
+  }
 
-  watch(error, (e) => {
-    if (e) {
-      console.error(`ResearchFeedback error,`, e)
-    }
-  })
+  function clear() {
+    feedback.value = []
+    error.value = ''
+  }
 
   defineExpose({
     getFeedback,
@@ -111,6 +78,7 @@
     </template>
 
     <div class="flex flex-col gap-2">
+      <p v-if="error" class="text-red-500">{{ error }}</p>
       <div v-if="!feedback.length && !error">Waiting for model feedback...</div>
       <template v-else>
         <div v-if="error" class="text-red-500">{{ error }}</div>

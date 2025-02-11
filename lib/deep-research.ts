@@ -19,7 +19,7 @@ export interface WriteFinalReportParams {
   prompt: string;
   learnings: string[];
 }
-
+// useRuntimeConfig()
 // Used for streaming response
 export type SearchQuery = z.infer<typeof searchQueriesTypeSchema>['queries'][0];
 export type PartialSearchQuery = DeepPartial<SearchQuery>;

@@ -1,10 +1,20 @@
 # Deep Research Web UI
 
-This is a web UI for https://github.com/dzhng/deep-research. It supports streaming AI responses, and viasualization of the research process using a tree structure.
+This is a web UI for https://github.com/dzhng/deep-research.
 
 > Note: The project is currently WIP, expect bugs.
 
 <video src="https://github.com/user-attachments/assets/c3738551-b258-47c6-90a8-fd097e5165c8"></video>
+
+Features:
+
+- Stream AI responses for realtime feedback
+- Viasualization of the research process using a tree structure
+- Bring Your Own API Key: Everything (config, API requests, ...) happens in your browser
+
+Available providers currently:
+- AI: OpenAI compatible
+- Web Search: Tavily (similar to Firecrawl, but with more free quota (1000 credits / month))
 
 ## Setup
 

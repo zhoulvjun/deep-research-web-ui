@@ -3,31 +3,17 @@ import { getEncoding } from 'js-tiktoken'
 
 import { RecursiveCharacterTextSplitter } from './text-splitter'
 
-// Providers
-const openai = createOpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY!,
-  baseURL: import.meta.env.VITE_OPENAI_ENDPOINT || 'https://api.openai.com/v1',
-})
-
-const customModel = import.meta.env.VITE_OPENAI_MODEL || 'o3-mini'
-
-// Models
-
-export const o3MiniModel = openai(customModel, {
-  // reasoningEffort: customModel.startsWith('o') ? 'medium' : undefined,
-  structuredOutputs: true,
-})
-
 const MinChunkSize = 140
 const encoder = getEncoding('o200k_base')
 
 // trim prompt to maximum context size
-export function trimPrompt(
-  prompt: string,
-  contextSize = Number(import.meta.env.VITE_CONTEXT_SIZE) || 128_000,
-) {
+export function trimPrompt(prompt: string, contextSize?: number) {
   if (!prompt) {
     return ''
+  }
+
+  if (!contextSize) {
+    contextSize = useConfigStore().config.ai.contextSize || 128_000
   }
 
   const length = encoder.encode(prompt).length

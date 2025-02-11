@@ -1,13 +1,15 @@
-import { generateObject, streamText } from 'ai'
+import { streamText } from 'ai'
 import { compact } from 'lodash-es'
 import pLimit from 'p-limit'
 import { z } from 'zod'
 import { parseStreamingJson, type DeepPartial } from '~/utils/json'
 
-import { o3MiniModel, trimPrompt } from './ai/providers'
+import { trimPrompt } from './ai/providers'
 import { systemPrompt } from './prompt'
 import zodToJsonSchema from 'zod-to-json-schema'
-import { tavily, type TavilySearchResponse } from '@tavily/core'
+import { type TavilySearchResponse } from '@tavily/core'
+import { useTavily } from '~/composables/useTavily'
+import { useAiModel } from '~/composables/useAiProvider'
 
 export type ResearchResult = {
   learnings: string[]
@@ -53,16 +55,6 @@ export type ResearchStep =
 // increase this if you have higher API rate limits
 const ConcurrencyLimit = 2
 
-// Initialize Firecrawl with optional API key and optional base url
-
-// const firecrawl = new FirecrawlApp({
-//   apiKey: process.env.FIRECRAWL_KEY ?? '',
-//   apiUrl: process.env.FIRECRAWL_BASE_URL,
-// });
-const tvly = tavily({
-  apiKey: import.meta.env.VITE_TAVILY_API_KEY ?? '',
-})
-
 /**
  * Schema for {@link generateSearchQueries} without dynamic descriptions
  */
@@ -105,12 +97,14 @@ export function generateSearchQueries({
   const prompt = [
     `Given the following prompt from the user, generate a list of SERP queries to research the topic. Return a maximum of ${numQueries} queries, but feel free to return less if the original prompt is clear. Make sure each query is unique and not similar to each other: <prompt>${query}</prompt>\n\n`,
     learnings
-      ? `Here are some learnings from previous research, use them to generate more specific queries: ${learnings.join('\n')}`
+      ? `Here are some learnings from previous research, use them to generate more specific queries: ${learnings.join(
+          '\n',
+        )}`
       : '',
     `You MUST respond in JSON with the following schema: ${jsonSchema}`,
   ].join('\n\n')
   return streamText({
-    model: o3MiniModel,
+    model: useAiModel(),
     system: systemPrompt(),
     prompt,
   })
@@ -147,12 +141,14 @@ function processSearchResult({
   )
   const prompt = [
     `Given the following contents from a SERP search for the query <query>${query}</query>, generate a list of learnings from the contents. Return a maximum of ${numLearnings} learnings, but feel free to return less if the contents are clear. Make sure each learning is unique and not similar to each other. The learnings should be concise and to the point, as detailed and information dense as possible. Make sure to include any entities like people, places, companies, products, things, etc in the learnings, as well as any exact metrics, numbers, or dates. The learnings will be used to research the topic further.`,
-    `<contents>${contents.map((content) => `<content>\n${content}\n</content>`).join('\n')}</contents>`,
+    `<contents>${contents
+      .map((content) => `<content>\n${content}\n</content>`)
+      .join('\n')}</contents>`,
     `You MUST respond in JSON with the following schema: ${jsonSchema}`,
   ].join('\n\n')
 
   return streamText({
-    model: o3MiniModel,
+    model: useAiModel(),
     abortSignal: AbortSignal.timeout(60_000),
     system: systemPrompt(),
     prompt,
@@ -179,7 +175,7 @@ export function writeFinalReport({
   ].join('\n\n')
 
   return streamText({
-    model: o3MiniModel,
+    model: useAiModel(),
     system: systemPrompt(),
     prompt: _prompt,
   })
@@ -263,7 +259,7 @@ export async function deepResearch({
             //   limit: 5,
             //   scrapeOptions: { formats: ['markdown'] },
             // });
-            const result = await tvly.search(searchQuery.query, {
+            const result = await useTavily().search(searchQuery.query, {
               maxResults: 5,
             })
             console.log(
@@ -331,7 +327,9 @@ export async function deepResearch({
 
               const nextQuery = `
               Previous research goal: ${searchQuery.researchGoal}
-              Follow-up research directions: ${searchResult.followUpQuestions.map((q) => `\n${q}`).join('')}
+              Follow-up research directions: ${searchResult.followUpQuestions
+                .map((q) => `\n${q}`)
+                .join('')}
             `.trim()
 
               return deepResearch({

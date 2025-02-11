@@ -2,8 +2,8 @@ import { streamText } from 'ai'
 import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
 
-import { o3MiniModel } from './ai/providers'
 import { systemPrompt } from './prompt'
+import { useAiModel } from '~/composables/useAiProvider'
 
 type PartialFeedback = DeepPartial<z.infer<typeof feedbackTypeSchema>>
 
@@ -32,7 +32,7 @@ export function generateFeedback({
   ].join('\n\n')
 
   const stream = streamText({
-    model: o3MiniModel,
+    model: useAiModel(),
     system: systemPrompt(),
     prompt,
   })

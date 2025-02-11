@@ -1,16 +1,18 @@
 <script setup lang="ts">
-  import { deepResearch, type PartialSearchResult, type ResearchStep } from '~/lib/deep-research'
+  import { deepResearch, type PartialSearchResult, type ResearchResult, type ResearchStep } from '~/lib/deep-research'
   import type { TreeNode } from './Tree.vue'
+
+  const emit = defineEmits<{
+    (e: 'complete', results: ResearchResult): void
+  }>()
 
   const tree = ref<TreeNode>({
     id: '0',
     label: 'Start',
     children: [],
   })
-  const selectedNode = ref<TreeNode | null>(null)
+  const selectedNode = ref<TreeNode>()
   const searchResults = ref<Record<string, PartialSearchResult>>({})
-
-  const modelValue = computed(() => Object.values(searchResults.value))
 
   function handleResearchProgress(step: ResearchStep) {
     let node: TreeNode | null = null
@@ -23,14 +25,10 @@
         node.status = step.type
       }
     }
-    console.log('step', step)
 
     switch (step.type) {
       case 'generating_query': {
         if (!node) {
-          console.error('Creating new node', {
-            nodeId,
-          })
           // 创建新节点
           node = {
             id: nodeId,
@@ -60,22 +58,16 @@
       }
 
       case 'generated_query': {
-        if (node) {
-        }
         break
       }
 
       case 'searching': {
-        if (node) {
-          // node.label = `Searching: ${node.query}`
-        }
         break
       }
 
       case 'search_complete': {
         if (node) {
           node.visitedUrls = step.urls
-          // node.label = `Found ${step.urls.length} results for: ${node.query}`
         }
         break
       }
@@ -101,7 +93,7 @@
         break
 
       case 'complete':
-        console.log('Research complete')
+        emit('complete', step)
         break
     }
   }
@@ -121,6 +113,14 @@
     return null
   }
 
+  function selectNode(node: TreeNode) {
+    if (selectedNode.value?.id === node.id) {
+      selectedNode.value = undefined
+    } else {
+      selectedNode.value = node
+    }
+  }
+
   // 辅助函数：获取节点的父节点 ID
   function getParentNodeId(nodeId: string): string {
     const parts = nodeId.split('-')
@@ -128,24 +128,13 @@
     return parts.join('-')
   }
 
-  async function startResearch(
-    query: string,
-    depth: number,
-    breadth: number,
-    feedback: { assistantQuestion: string; userAnswer: string }[],
-  ) {
-    console.log('startResearch', query, depth, breadth, feedback)
+  async function startResearch(query: string, depth: number, breadth: number) {
     tree.value.children = []
-    selectedNode.value = null
+    selectedNode.value = undefined
     searchResults.value = {}
     try {
-      const combinedQuery = `
-Initial Query: ${query}
-Follow-up Questions and Answers:
-${feedback.map((qa) => `Q: ${qa.assistantQuestion}\nA: ${qa.userAnswer}`).join('\n')}
-    `
       await deepResearch({
-        query: combinedQuery,
+        query,
         maxDepth: depth,
         breadth,
         onProgress: handleResearchProgress,
@@ -163,15 +152,20 @@ ${feedback.map((qa) => `Q: ${qa.assistantQuestion}\nA: ${qa.userAnswer}`).join('
 <template>
   <UCard>
     <template #header>
-      <h2 class="font-bold">Deep Research</h2>
-      <p class="text-sm text-gray-500">Click a child node to view details</p>
+      <h2 class="font-bold">3. Web Browsing</h2>
+      <p class="text-sm text-gray-500">
+        The AI will then search the web based on our research goal, and iterate until the depth is reached.
+        <br />
+        Click a child node to view details.
+      </p>
     </template>
     <div class="flex flex-col">
       <div class="overflow-y-auto">
-        <Tree :node="tree" :selected-node="selectedNode" @select="selectedNode = $event" />
+        <Tree :node="tree" :selected-node="selectedNode" @select="selectNode" />
       </div>
       <div v-if="selectedNode" class="p-4">
-        <h2 class="text-xl font-bold">{{ selectedNode.label }}</h2>
+        <USeparator label="Node Details" />
+        <h2 class="text-xl font-bold mt-2">{{ selectedNode.label }}</h2>
 
         <!-- Root node has no additional information -->
         <p v-if="selectedNode.id === '0'"> This is the beginning of your deep research journey! </p>

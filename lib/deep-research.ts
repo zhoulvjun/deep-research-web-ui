@@ -9,6 +9,17 @@ import { systemPrompt } from './prompt';
 import zodToJsonSchema from 'zod-to-json-schema';
 import { tavily, type TavilySearchResponse } from '@tavily/core';
 
+export type ResearchResult = {
+  learnings: string[];
+  visitedUrls: string[];
+};
+
+
+export interface WriteFinalReportParams {
+  prompt: string;
+  learnings: string[];
+}
+
 // Used for streaming response
 export type SearchQuery = z.infer<typeof searchQueriesTypeSchema>['queries'][0];
 export type PartialSearchQuery = DeepPartial<SearchQuery>;
@@ -23,7 +34,7 @@ export type ResearchStep =
   | { type: 'processing_serach_result'; query: string; result: PartialSearchResult; nodeId: string }
   | { type: 'processed_search_result'; query: string; result: SearchResult; nodeId: string }
   | { type: 'error'; message: string; nodeId: string }
-  | { type: 'complete' };
+  | { type: 'complete'; learnings: string[], visitedUrls: string[] };
 
 // increase this if you have higher API rate limits
 const ConcurrencyLimit = 2;
@@ -138,36 +149,30 @@ function processSearchResult({
   });
 }
 
-export async function writeFinalReport({
+export function writeFinalReport({
   prompt,
   learnings,
-  visitedUrls,
-}: {
-  prompt: string;
-  learnings: string[];
-  visitedUrls: string[];
-}) {
+}: WriteFinalReportParams) {
   const learningsString = trimPrompt(
     learnings
       .map(learning => `<learning>\n${learning}\n</learning>`)
       .join('\n'),
     150_000,
   );
+  const _prompt = [
+    `Given the following prompt from the user, write a final report on the topic using the learnings from research. Make it as as detailed as possible, aim for 3 or more pages, include ALL the learnings from research:`,
+    `<prompt>${prompt}</prompt>`,
+    `Here are all the learnings from previous research:`,
+    `<learnings>\n${learningsString}\n</learnings>`,
+    `Write the report in Markdown.`,
+    `## Deep Research Report`
+  ].join('\n\n');
 
-  const res = await generateObject({
+  return streamText({
     model: o3MiniModel,
     system: systemPrompt(),
-    prompt: `Given the following prompt from the user, write a final report on the topic using the learnings from research. Make it as as detailed as possible, aim for 3 or more pages, include ALL the learnings from research:\n\n<prompt>${prompt}</prompt>\n\nHere are all the learnings from previous research:\n\n<learnings>\n${learningsString}\n</learnings>`,
-    schema: z.object({
-      reportMarkdown: z
-        .string()
-        .describe('Final report on the topic in Markdown'),
-    }),
+    prompt: _prompt,
   });
-
-  // Append the visited URLs section to the report
-  const urlsSection = `\n\n## Sources\n\n${visitedUrls.map(url => `- ${url}`).join('\n')}`;
-  return res.object.reportMarkdown + urlsSection;
 }
 
 function childNodeId(parentNodeId: string, currentIndex: number) {
@@ -192,7 +197,7 @@ export async function deepResearch({
   onProgress: (step: ResearchStep) => void;
   currentDepth?: number;
   nodeId?: string
-}): Promise<void> {
+}): Promise<ResearchResult> {
   try {
     const searchQueriesResult = generateSearchQueries({
       query,
@@ -229,10 +234,13 @@ export async function deepResearch({
       });
     }
 
-    await Promise.all(
+    const results = await Promise.all(
       searchQueries.map((searchQuery, i) =>
         limit(async () => {
-          if (!searchQuery?.query) return
+          if (!searchQuery?.query) return {
+            learnings: [],
+            visitedUrls: [],
+          }
           onProgress({
             type: 'searching',
             query: searchQuery.query,
@@ -326,6 +334,21 @@ export async function deepResearch({
         }),
       ),
     );
+    // Conclude results
+    const _learnings = [...new Set(results.flatMap(r => r.learnings))]
+    const _visitedUrls = [...new Set(results.flatMap(r => r.visitedUrls))]
+    // Complete should only be called once
+    if (nodeId === '0') {
+      onProgress({
+        type: 'complete',
+        learnings: _learnings,
+        visitedUrls: _visitedUrls,
+      });
+    }
+    return {
+      learnings: _learnings,
+      visitedUrls: _visitedUrls,
+    }
   } catch (error: any) {
     console.error(error);
     onProgress({
@@ -333,9 +356,9 @@ export async function deepResearch({
       message: error?.message ?? 'Something went wrong',
       nodeId,
     })
+    return {
+      learnings: [],
+      visitedUrls: [],
+    }
   }
-
-  onProgress({
-    type: 'complete',
-  });
 }

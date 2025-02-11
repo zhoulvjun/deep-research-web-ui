@@ -17,7 +17,7 @@
 
   const props = defineProps<{
     node: TreeNode
-    selectedNode: TreeNode | null
+    selectedNode?: TreeNode
   }>()
 
   const emit = defineEmits<{

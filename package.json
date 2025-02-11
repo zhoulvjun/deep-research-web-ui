@@ -20,6 +20,7 @@
     "@tavily/core": "^0.0.3",
     "@types/lodash-es": "^4.17.12",
     "ai": "^4.1.28",
+    "html2pdf.js": "^0.9.3",
     "js-tiktoken": "^1.0.18",
     "lodash-es": "^4.17.21",
     "marked": "^15.0.7",

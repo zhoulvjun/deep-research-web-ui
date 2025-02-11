@@ -9,12 +9,10 @@
   }
 
   defineEmits<{
-    (e: 'submit'): void
+    (e: 'submit', feedback: ResearchFeedbackResult[]): void
   }>()
 
-  const modelValue = defineModel<ResearchFeedbackResult[]>({
-    default: () => [],
-  })
+  const feedback = ref<ResearchFeedbackResult[]>([])
 
   const { messages, input, error, handleSubmit, isLoading } = useChat({
     api: '/api/generate-feedback',
@@ -22,9 +20,9 @@
 
   const isSubmitButtonDisabled = computed(
     () =>
-      !modelValue.value.length ||
+      !feedback.value.length ||
       // All questions should be answered
-      modelValue.value.some((v) => !v.assistantQuestion || !v.userAnswer) ||
+      feedback.value.some((v) => !v.assistantQuestion || !v.userAnswer) ||
       // Should not be loading
       isLoading.value,
   )
@@ -47,7 +45,7 @@
     messages.value = []
     input.value = ''
     error.value = undefined
-    modelValue.value = []
+    feedback.value = []
   }
 
   watch(messages, (m) => {
@@ -65,25 +63,25 @@
 
     if (parseResult.state === 'repaired-parse' || parseResult.state === 'successful-parse') {
       if (!isObject(parseResult.value) || Array.isArray(parseResult.value)) {
-        return (modelValue.value = [])
+        return (feedback.value = [])
       }
       const unsafeQuestions = parseResult.value.questions
-      if (!unsafeQuestions || !Array.isArray(unsafeQuestions)) return (modelValue.value = [])
+      if (!unsafeQuestions || !Array.isArray(unsafeQuestions)) return (feedback.value = [])
 
       const questions = unsafeQuestions.filter((s) => typeof s === 'string')
       // Incrementally update modelValue
       for (let i = 0; i < questions.length; i += 1) {
-        if (modelValue.value[i]) {
-          modelValue.value[i].assistantQuestion = questions[i]
+        if (feedback.value[i]) {
+          feedback.value[i].assistantQuestion = questions[i]
         } else {
-          modelValue.value.push({
+          feedback.value.push({
             assistantQuestion: questions[i],
             userAnswer: '',
           })
         }
       }
     } else {
-      modelValue.value = []
+      feedback.value = []
     }
   })
 
@@ -101,16 +99,21 @@
 
 <template>
   <UCard>
+    <template #header>
+      <h2 class="font-bold">2. Model Feedback</h2>
+      <p class="text-sm text-gray-500"> The AI will ask you some follow up questions to help you clarify the research direction. </p>
+    </template>
+
     <div class="flex flex-col gap-2">
-      <div v-if="!modelValue.length && !error">Waiting for model feedback...</div>
+      <div v-if="!feedback.length && !error">Waiting for model feedback...</div>
       <template v-else>
         <div v-if="error" class="text-red-500">{{ error }}</div>
-        <div v-for="(feedback, index) in modelValue" class="flex flex-col gap-2" :key="index">
+        <div v-for="(feedback, index) in feedback" class="flex flex-col gap-2" :key="index">
           Assistant: {{ feedback.assistantQuestion }}
           <UInput v-model="feedback.userAnswer" />
         </div>
       </template>
-      <UButton color="primary" :loading="isLoading" :disabled="isSubmitButtonDisabled" block @click="$emit('submit')">
+      <UButton color="primary" :loading="isLoading" :disabled="isSubmitButtonDisabled" block @click="$emit('submit', feedback)">
         Submit Answer
       </UButton>
     </div>

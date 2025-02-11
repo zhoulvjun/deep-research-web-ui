@@ -53,10 +53,6 @@
   import type { ResearchFeedbackResult } from '~/components/ResearchFeedback.vue'
   import type { ResearchResult } from '~/lib/deep-research'
 
-  useHead({
-    title: 'Deep Research Web UI',
-  })
-
   const config = useConfigStore()
   const toast = useToast()
 

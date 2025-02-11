@@ -10,18 +10,14 @@
     researchGoal?: string
     learnings?: string[]
     followUpQuestions?: string[]
+    visitedUrls?: string[]
     status?: TreeNodeStatus
     children: TreeNode[]
-    /** Current depth of the node */
-    depth: number
-    /** Maximum breadth at the current depth */
-    breadth: number
-    /** Index of the node among its siblings */
-    index?: number
   }
 
   const props = defineProps<{
     node: TreeNode
+    selectedNode: TreeNode | null
   }>()
 
   const emit = defineEmits<{
@@ -64,12 +60,19 @@
 <template>
   <div class="flex items-center gap-1">
     <UIcon name="i-lucide-circle-dot" />
-    <UButton :class="icon.pulse && 'animate-pulse'" :icon="icon.name" size="sm" color="info" @click="emit('select', node)">{{
-      node.label
-    }}</UButton>
+    <UButton
+      :class="icon.pulse && 'animate-pulse'"
+      :icon="icon.name"
+      size="sm"
+      :color="selectedNode?.id === node.id ? 'primary' : 'info'"
+      :variant="selectedNode?.id === node.id ? 'soft' : 'outline'"
+      @click="emit('select', node)"
+    >
+      {{ node.label }}
+    </UButton>
     <ol v-if="node.children.length > 0" class="space-y-2">
       <li v-for="node in node.children" :key="node.id">
-        <Tree class="ml-2" :node="node" @select="emit('select', $event)" />
+        <Tree class="ml-2" :node="node" :selected-node @select="emit('select', $event)" />
       </li>
     </ol>
   </div>

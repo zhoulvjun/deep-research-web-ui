@@ -16,13 +16,13 @@ export type SearchResult = z.infer<typeof searchResultTypeSchema>;
 export type PartialSearchResult = DeepPartial<SearchResult>;
 
 export type ResearchStep =
-  | { type: 'generating_query'; result: PartialSearchQuery; depth: number; breadth: number; nodeIndex: number; nodeId: string }
-  | { type: 'generated_query'; query: string; result: PartialSearchQuery; depth: number; breadth: number; nodeIndex: number; nodeId: string }
-  | { type: 'searching'; query: string; depth: number; breadth: number; nodeIndex: number; nodeId: string }
-  | { type: 'search_complete'; query: string; urls: string[]; depth: number; breadth: number; nodeIndex: number; nodeId: string }
-  | { type: 'processing_serach_result'; query: string; result: PartialSearchResult; depth: number; breadth: number; nodeIndex: number; nodeId: string }
-  | { type: 'processed_search_result'; query: string; result: SearchResult; depth: number; breadth: number; nodeIndex: number; nodeId: string }
-  | { type: 'error'; message: string; depth: number; nodeId: string }
+  | { type: 'generating_query'; result: PartialSearchQuery; nodeId: string }
+  | { type: 'generated_query'; query: string; result: PartialSearchQuery; nodeId: string }
+  | { type: 'searching'; query: string; nodeId: string }
+  | { type: 'search_complete'; urls: string[]; nodeId: string }
+  | { type: 'processing_serach_result'; query: string; result: PartialSearchResult; nodeId: string }
+  | { type: 'processed_search_result'; query: string; result: SearchResult; nodeId: string }
+  | { type: 'error'; message: string; nodeId: string }
   | { type: 'complete' };
 
 // increase this if you have higher API rate limits
@@ -104,7 +104,6 @@ function processSearchResult({
   numFollowUpQuestions = 3,
 }: {
   query: string;
-  // result: SearchResponse;
   result: TavilySearchResponse
   numLearnings?: number;
   numFollowUpQuestions?: number;
@@ -214,9 +213,6 @@ export async function deepResearch({
           onProgress({
             type: 'generating_query',
             result: searchQueries[i],
-            depth: currentDepth,
-            breadth,
-            nodeIndex: i,
             nodeId: childNodeId(nodeId, i)
           });
         }
@@ -229,24 +225,18 @@ export async function deepResearch({
         type: 'generated_query',
         query,
         result: searchQueries[i],
-        depth: currentDepth,
-        breadth,
-        nodeIndex: i,
         nodeId: childNodeId(nodeId, i)
       });
     }
 
     await Promise.all(
-      searchQueries.map((searchQuery, nodeIndex) =>
+      searchQueries.map((searchQuery, i) =>
         limit(async () => {
           if (!searchQuery?.query) return
           onProgress({
             type: 'searching',
             query: searchQuery.query,
-            depth: currentDepth,
-            breadth,
-            nodeIndex,
-            nodeId: childNodeId(nodeId, nodeIndex)
+            nodeId: childNodeId(nodeId, i)
           })
           try {
             // const result = await firecrawl.search(searchQuery.query, {
@@ -261,6 +251,11 @@ export async function deepResearch({
 
             // Collect URLs from this search
             const newUrls = compact(result.results.map(item => item.url));
+            onProgress({
+              type: 'search_complete',
+              urls: newUrls,
+              nodeId: childNodeId(nodeId, i),
+            })
             // Breadth for the next search is half of the current breadth
             const nextBreadth = Math.ceil(breadth / 2);
 
@@ -280,11 +275,8 @@ export async function deepResearch({
               onProgress({
                 type: 'processing_serach_result',
                 result: parsedLearnings,
-                depth: currentDepth,
-                breadth: breadth,
                 query: searchQuery.query,
-                nodeIndex: nodeIndex,
-                nodeId: childNodeId(nodeId, nodeIndex)
+                nodeId: childNodeId(nodeId, i)
               });
             }
             console.log(`Processed search result for ${searchQuery.query}`, searchResult);
@@ -298,11 +290,8 @@ export async function deepResearch({
                 learnings: allLearnings,
                 followUpQuestions: searchResult.followUpQuestions ?? [],
               },
-              depth: currentDepth,
-              breadth,
               query: searchQuery.query,
-              nodeIndex: nodeIndex,
-              nodeId: childNodeId(nodeId, nodeIndex)
+              nodeId: childNodeId(nodeId, i)
             })
 
             if (nextDepth < maxDepth && searchResult.followUpQuestions?.length) {
@@ -323,7 +312,7 @@ export async function deepResearch({
                 visitedUrls: allUrls,
                 onProgress,
                 currentDepth: nextDepth,
-                nodeId: childNodeId(nodeId, nodeIndex),
+                nodeId: childNodeId(nodeId, i),
               });
             } else {
               return {
@@ -342,7 +331,6 @@ export async function deepResearch({
     onProgress({
       type: 'error',
       message: error?.message ?? 'Something went wrong',
-      depth: currentDepth,
       nodeId,
     })
   }

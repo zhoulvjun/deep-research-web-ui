@@ -3,13 +3,11 @@
   import type { TreeNode } from './Tree.vue'
 
   const tree = ref<TreeNode>({
-    id: 'root',
+    id: '0',
     label: 'Start',
     children: [],
-    depth: 0,
-    breadth: 0,
   })
-  const hoveredNode = ref<TreeNode | null>(null)
+  const selectedNode = ref<TreeNode | null>(null)
   const searchResults = ref<Record<string, PartialSearchResult>>({})
 
   const modelValue = computed(() => Object.values(searchResults.value))
@@ -32,9 +30,6 @@
         if (!node) {
           console.error('Creating new node', {
             nodeId,
-            depth: step.depth,
-            breadth: step.breadth,
-            index: step.nodeIndex,
           })
           // 创建新节点
           node = {
@@ -43,12 +38,10 @@
             researchGoal: 'Generating research goal...',
             learnings: [],
             children: [],
-            depth: step.depth,
-            breadth: step.breadth,
-            index: step.nodeIndex,
           }
+          const parentNodeId = getParentNodeId(nodeId)
           // 如果是根节点的直接子节点
-          if (step.depth === 1) {
+          if (parentNodeId === '0') {
             tree.value.children.push(node)
           } else {
             // 找到父节点并添加
@@ -81,6 +74,7 @@
 
       case 'search_complete': {
         if (node) {
+          node.visitedUrls = step.urls
           // node.label = `Found ${step.urls.length} results for: ${node.query}`
         }
         break
@@ -90,7 +84,6 @@
         if (node) {
           node.learnings = step.result.learnings || []
           node.followUpQuestions = step.result.followUpQuestions || []
-          // node.label = `Processing results: ${node.query}`
         }
         break
       }
@@ -98,7 +91,6 @@
       case 'processed_search_result': {
         if (node) {
           node.learnings = step.result.learnings
-          // node.label = `Completed: ${node.query}`
           searchResults.value[nodeId] = step.result
         }
         break
@@ -144,9 +136,7 @@
   ) {
     console.log('startResearch', query, depth, breadth, feedback)
     tree.value.children = []
-    tree.value.depth = depth
-    tree.value.breadth = breadth
-    hoveredNode.value = null
+    selectedNode.value = null
     searchResults.value = {}
     try {
       const combinedQuery = `
@@ -178,18 +168,29 @@ ${feedback.map((qa) => `Q: ${qa.assistantQuestion}\nA: ${qa.userAnswer}`).join('
     </template>
     <div class="flex flex-col">
       <div class="overflow-y-auto">
-        <Tree :node="tree" @select="hoveredNode = $event" />
+        <Tree :node="tree" :selected-node="selectedNode" @select="selectedNode = $event" />
       </div>
-      <div v-if="hoveredNode" class="p-4">
-        <h2 class="text-xl font-bold">{{ hoveredNode.label }}</h2>
-        <h3 class="text-lg font-semibold mt-2">Research Goal:</h3>
-        <p>{{ hoveredNode.researchGoal }}</p>
-        <div v-if="hoveredNode.learnings">
-          <h3 class="text-lg font-semibold mt-2">Learnings:</h3>
-          <ul>
-            <li v-for="(learning, index) in hoveredNode.learnings" :key="index">{{ learning }}</li>
+      <div v-if="selectedNode" class="p-4">
+        <h2 class="text-xl font-bold">{{ selectedNode.label }}</h2>
+
+        <!-- Root node has no additional information -->
+        <p v-if="selectedNode.id === '0'"> This is the beginning of your deep research journey! </p>
+        <template v-else>
+          <h3 class="text-lg font-semibold mt-2">Research Goal:</h3>
+          <p>{{ selectedNode.researchGoal }}</p>
+
+          <h3 class="text-lg font-semibold mt-2">Visited URLs:</h3>
+          <ul class="list-disc list-inside">
+            <li v-for="(url, index) in selectedNode.visitedUrls" :key="index">
+              <ULink :href="url" target="_blank">{{ url }}</ULink>
+            </li>
           </ul>
-        </div>
+
+          <h3 class="text-lg font-semibold mt-2">Learnings:</h3>
+          <ul class="list-disc list-inside">
+            <li v-for="(learning, index) in selectedNode.learnings" :key="index">{{ learning }}</li>
+          </ul>
+        </template>
       </div>
     </div>
   </UCard>

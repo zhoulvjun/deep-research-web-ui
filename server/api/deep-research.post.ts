@@ -1,3 +1,4 @@
+// This file is currently unused
 import { deepResearch, ResearchStep } from "~/lib/deep-research";
 
 export default defineEventHandler(async event => {

@@ -58,8 +58,8 @@
   }>()
 
   const input = ref('天空为什么是蓝的？')
-  const breadth = ref(6)
-  const depth = ref(3)
+  const breadth = ref(3)
+  const depth = ref(2)
   const numQuestions = ref(1)
   const isLoading = ref(false)
   const result = ref<any>(null)
@@ -91,13 +91,13 @@
       toast.add({
         title: '复制成功',
         description: '研究报告已复制到剪贴板',
-        icon: 'i-heroicons-check-circle',
+        icon: 'i-lucide-badge-check',
       })
     } catch (e) {
       toast.add({
         title: '复制失败',
         description: '无法复制到剪贴板',
-        icon: 'i-heroicons-x-circle',
+        icon: 'i-lucide-x',
         color: 'error',
       })
     }

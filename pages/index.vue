@@ -1,14 +1,12 @@
 <template>
   <div>
     <UContainer>
-      <div class="py-8">
-        <div class="max-w-4xl mx-auto">
-          <h1 class="text-3xl font-bold text-center mb-2"> Deep Research Assistant </h1>
-          <ColorModeButton></ColorModeButton>
-          <ResearchForm @submit="generateFeedback" />
-          <ResearchFeedback v-model="result.feedback" ref="feedbackRef" @submit="startDeepSearch" />
-          <DeepResearch v-model="searchTree" ref="deepResearchRef" class="mb-8" />
-        </div>
+      <div class="max-w-4xl mx-auto py-8 space-y-4">
+        <h1 class="text-3xl font-bold text-center mb-2"> Deep Research Assistant </h1>
+        <ColorModeButton></ColorModeButton>
+        <ResearchForm @submit="generateFeedback" />
+        <ResearchFeedback v-model="result.feedback" ref="feedbackRef" @submit="startDeepSearch" />
+        <DeepResearch ref="deepResearchRef" class="mb-8" />
       </div>
     </UContainer>
   </div>
@@ -18,7 +16,6 @@
   import type ResearchFeedback from '~/components/ResearchFeedback.vue'
   import type DeepResearch from '~/components/DeepResearch.vue'
   import type { ResearchInputData } from '~/components/ResearchForm.vue'
-  import type { SearchTree } from '~/components/DeepResearch.vue'
   import type { ResearchFeedbackResult } from '~/components/ResearchFeedback.vue'
 
   interface DeepResearchResult {
@@ -39,7 +36,7 @@
   const result = ref<DeepResearchResult>({
     feedback: [],
   })
-  const searchTree = ref<SearchTree>({
+  const searchTree = ref({
     root: null,
     currentDepth: 0,
     maxDepth: 0,

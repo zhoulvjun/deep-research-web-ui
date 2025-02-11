@@ -63,7 +63,6 @@
     // Write the questions into modelValue
     const parseResult = parsePartialJson(content)
 
-    console.log(parseResult)
     if (parseResult.state === 'repaired-parse' || parseResult.state === 'successful-parse') {
       if (!isObject(parseResult.value) || Array.isArray(parseResult.value)) {
         return (modelValue.value = [])

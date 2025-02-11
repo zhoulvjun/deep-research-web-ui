@@ -10,7 +10,7 @@
   const loading = ref(false)
   const loadingExportPdf = ref(false)
   const reportContent = ref('')
-  const reportHtml = computed(() => marked(reportContent.value))
+  const reportHtml = computed(() => marked(reportContent.value, { gfm: true, silent: true }))
   const isExportButtonDisabled = computed(() => !reportContent.value || loading.value || loadingExportPdf.value)
 
   async function generateReport(params: CustomReportParams) {
@@ -31,28 +31,52 @@
   }
 
   async function exportToPdf() {
+    const element = document.getElementById('report-content')
+    if (!element) return
+
+    // Create a temp container
+    const tempContainer = document.createElement('div')
     loadingExportPdf.value = true
+
     try {
-      // 动态导入 html2pdf，确保只在客户端执行
+      // Dinamically import html2pdf
       // @ts-ignore
       const html2pdf = (await import('html2pdf.js')).default
 
-      const element = document.getElementById('report-content')
+      tempContainer.innerHTML = element.innerHTML
+      tempContainer.className = element.className
 
-      if (element) {
-        const opt = {
-          margin: [10, 10],
-          filename: 'research-report.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        }
+      // Use print-friendly styles
+      tempContainer.style.cssText = `
+        font-family: Arial, sans-serif;
+        color: black;
+        background-color: white;
+        padding: 20px;
+      `
 
-        await html2pdf().set(opt).from(element).save()
+      document.body.appendChild(tempContainer)
+
+      const opt = {
+        margin: [10, 10],
+        filename: 'research-report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait',
+        },
       }
+
+      await html2pdf().set(opt).from(tempContainer).save()
     } catch (error) {
       console.error('Export to PDF failed:', error)
     } finally {
+      document.body.removeChild(tempContainer)
       loadingExportPdf.value = false
     }
   }

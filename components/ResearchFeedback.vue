@@ -8,6 +8,10 @@
     userAnswer: string
   }
 
+  const props = defineProps<{
+    isLoadingSearch?: boolean
+  }>()
+
   defineEmits<{
     (e: 'submit', feedback: ResearchFeedbackResult[]): void
   }>()
@@ -24,7 +28,8 @@
       // All questions should be answered
       feedback.value.some((v) => !v.assistantQuestion || !v.userAnswer) ||
       // Should not be loading
-      isLoading.value,
+      isLoading.value ||
+      props.isLoadingSearch,
   )
 
   async function getFeedback(query: string, numQuestions = 3) {
@@ -94,6 +99,7 @@
   defineExpose({
     getFeedback,
     clear,
+    isLoading,
   })
 </script>
 
@@ -113,7 +119,13 @@
           <UInput v-model="feedback.userAnswer" />
         </div>
       </template>
-      <UButton color="primary" :loading="isLoading" :disabled="isSubmitButtonDisabled" block @click="$emit('submit', feedback)">
+      <UButton
+        color="primary"
+        :loading="isLoadingSearch || isLoading"
+        :disabled="isSubmitButtonDisabled"
+        block
+        @click="$emit('submit', feedback)"
+      >
         Submit Answer
       </UButton>
     </div>

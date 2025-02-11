@@ -13,6 +13,7 @@
   })
   const selectedNode = ref<TreeNode>()
   const searchResults = ref<Record<string, PartialSearchResult>>({})
+  const isLoading = ref(false)
 
   function handleResearchProgress(step: ResearchStep) {
     let node: TreeNode | null = null
@@ -94,6 +95,7 @@
 
       case 'complete':
         emit('complete', step)
+        isLoading.value = false
         break
     }
   }
@@ -132,6 +134,7 @@
     tree.value.children = []
     selectedNode.value = undefined
     searchResults.value = {}
+    isLoading.value = true
     try {
       await deepResearch({
         query,
@@ -141,11 +144,14 @@
       })
     } catch (error) {
       console.error('Research failed:', error)
+    } finally {
+      isLoading.value = false
     }
   }
 
   defineExpose({
     startResearch,
+    isLoading,
   })
 </script>
 

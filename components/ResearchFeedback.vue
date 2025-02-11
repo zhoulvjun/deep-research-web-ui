@@ -74,7 +74,10 @@
   <UCard>
     <template #header>
       <h2 class="font-bold">2. Model Feedback</h2>
-      <p class="text-sm text-gray-500"> The AI will ask you some follow up questions to help you clarify the research direction. </p>
+      <p class="text-sm text-gray-500">
+        The AI will ask you some follow up questions to help you clarify the
+        research direction.
+      </p>
     </template>
 
     <div class="flex flex-col gap-2">
@@ -82,7 +85,11 @@
       <div v-if="!feedback.length && !error">Waiting for model feedback...</div>
       <template v-else>
         <div v-if="error" class="text-red-500">{{ error }}</div>
-        <div v-for="(feedback, index) in feedback" class="flex flex-col gap-2" :key="index">
+        <div
+          v-for="(feedback, index) in feedback"
+          class="flex flex-col gap-2"
+          :key="index"
+        >
           Assistant: {{ feedback.assistantQuestion }}
           <UInput v-model="feedback.userAnswer" />
         </div>

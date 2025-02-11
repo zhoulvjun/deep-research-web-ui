@@ -19,6 +19,10 @@
 
 <template>
   <div>
-    <UButton :icon="preference === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'" color="primary" @click="toggleColorMode" />
+    <UButton
+      :icon="preference === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
+      color="primary"
+      @click="toggleColorMode"
+    />
   </div>
 </template>

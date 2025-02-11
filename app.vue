@@ -18,9 +18,15 @@
         content:
           'SiliconCloud Stats 是一个用于分析 SiliconCloud 平台使用情况的工具。通过输入 Cookie，可以拉取 SiliconCloud 控制台 API 来实现各种分析功能，如 token 用量分析等。',
       },
-      { name: 'keywords', content: 'SiliconCloud, 数据分析, token 用量, API 分析, 控制台工具' },
+      {
+        name: 'keywords',
+        content: 'SiliconCloud, 数据分析, token 用量, API 分析, 控制台工具',
+      },
       // Open Graph tags
-      { property: 'og:title', content: 'SiliconCloud Stats - SiliconCloud 平台使用情况分析工具' },
+      {
+        property: 'og:title',
+        content: 'SiliconCloud Stats - SiliconCloud 平台使用情况分析工具',
+      },
       {
         property: 'og:description',
         content:
@@ -30,8 +36,15 @@
       { property: 'og:image', content: '/images/readme-showcase-total.webp' },
       // Twitter Card tags
       { name: 'twitter:card', content: 'summary_large_image' },
-      { name: 'twitter:title', content: 'SiliconCloud Stats - SiliconCloud 平台使用情况分析工具' },
-      { name: 'twitter:description', content: 'SiliconCloud Stats 是一个用于分析 SiliconCloud 平台使用情况的工具。' },
+      {
+        name: 'twitter:title',
+        content: 'SiliconCloud Stats - SiliconCloud 平台使用情况分析工具',
+      },
+      {
+        name: 'twitter:description',
+        content:
+          'SiliconCloud Stats 是一个用于分析 SiliconCloud 平台使用情况的工具。',
+      },
       { name: 'twitter:image', content: '/images/readme-showcase-total.webp' },
     ],
     // script: [

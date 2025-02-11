@@ -1,6 +1,9 @@
 <script setup lang="ts">
   import { marked } from 'marked'
-  import { writeFinalReport, type WriteFinalReportParams } from '~/lib/deep-research'
+  import {
+    writeFinalReport,
+    type WriteFinalReportParams,
+  } from '~/lib/deep-research'
 
   interface CustomReportParams extends WriteFinalReportParams {
     visitedUrls: string[]
@@ -10,8 +13,12 @@
   const loading = ref(false)
   const loadingExportPdf = ref(false)
   const reportContent = ref('')
-  const reportHtml = computed(() => marked(reportContent.value, { gfm: true, silent: true }))
-  const isExportButtonDisabled = computed(() => !reportContent.value || loading.value || loadingExportPdf.value)
+  const reportHtml = computed(() =>
+    marked(reportContent.value, { gfm: true, silent: true }),
+  )
+  const isExportButtonDisabled = computed(
+    () => !reportContent.value || loading.value || loadingExportPdf.value,
+  )
 
   async function generateReport(params: CustomReportParams) {
     loading.value = true
@@ -113,7 +120,9 @@
     />
     <template v-else>
       <div v-if="error" class="text-red-500">{{ error }}</div>
-      <div v-else>{{ loading ? 'Generating report...' : 'Waiting for report..' }}.</div>
+      <div v-else
+        >{{ loading ? 'Generating report...' : 'Waiting for report..' }}.</div
+      >
     </template>
   </UCard>
 </template>

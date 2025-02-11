@@ -72,7 +72,12 @@
     </UButton>
     <ol v-if="node.children.length > 0" class="space-y-2">
       <li v-for="node in node.children" :key="node.id">
-        <Tree class="ml-2" :node="node" :selected-node @select="emit('select', $event)" />
+        <Tree
+          class="ml-2"
+          :node="node"
+          :selected-node
+          @select="emit('select', $event)"
+        />
       </li>
     </ol>
   </div>

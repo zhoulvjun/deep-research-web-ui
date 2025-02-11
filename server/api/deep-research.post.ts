@@ -1,9 +1,8 @@
 // This file is currently unused
-import { deepResearch, ResearchStep } from "~/lib/deep-research";
+import { deepResearch, ResearchStep } from '~/lib/deep-research'
 
-export default defineEventHandler(async event => {
-  const { initialQuery, feedback, depth, breadth } =
-    await readBody(event)
+export default defineEventHandler(async (event) => {
+  const { initialQuery, feedback, depth, breadth } = await readBody(event)
   console.log({ initialQuery, feedback, depth, breadth })
 
   // 设置 SSE 响应头

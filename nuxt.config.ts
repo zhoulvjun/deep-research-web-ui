@@ -1,11 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    '@pinia/nuxt',
-    '@nuxt/ui',
-    '@nuxtjs/color-mode',
-    '@vueuse/nuxt',
-  ],
+  modules: ['@pinia/nuxt', '@nuxt/ui', '@nuxtjs/color-mode', '@vueuse/nuxt'],
 
   colorMode: {
     preference: 'system',

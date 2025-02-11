@@ -3,12 +3,26 @@
     <UContainer>
       <div class="max-w-4xl mx-auto py-8 space-y-4">
         <div class="flex items-center justify-between">
-          <h1 class="text-3xl font-bold text-center mb-2"> Deep Research Assistant </h1>
+          <h1 class="text-3xl font-bold text-center mb-2">
+            Deep Research Assistant
+          </h1>
           <ColorModeButton />
         </div>
-        <ResearchForm :is-loading-feedback="!!feedbackRef?.isLoading" ref="formRef" @submit="generateFeedback" />
-        <ResearchFeedback :is-loading-search="!!deepResearchRef?.isLoading" ref="feedbackRef" @submit="startDeepSearch" />
-        <DeepResearch ref="deepResearchRef" @complete="generateReport" class="mb-8" />
+        <ResearchForm
+          :is-loading-feedback="!!feedbackRef?.isLoading"
+          ref="formRef"
+          @submit="generateFeedback"
+        />
+        <ResearchFeedback
+          :is-loading-search="!!deepResearchRef?.isLoading"
+          ref="feedbackRef"
+          @submit="startDeepSearch"
+        />
+        <DeepResearch
+          ref="deepResearchRef"
+          @complete="generateReport"
+          class="mb-8"
+        />
         <ResearchReport ref="reportRef" />
       </div>
     </UContainer>
@@ -49,9 +63,18 @@ ${feedback.value.map((qa) => `Q: ${qa.assistantQuestion}\nA: ${qa.userAnswer}`).
   }
 
   async function startDeepSearch(_feedback: ResearchFeedbackResult[]) {
-    if (!formRef.value?.form.query || !formRef.value?.form.breadth || !formRef.value?.form.depth) return
+    if (
+      !formRef.value?.form.query ||
+      !formRef.value?.form.breadth ||
+      !formRef.value?.form.depth
+    )
+      return
     feedback.value = _feedback
-    deepResearchRef.value?.startResearch(getCombinedQuery(), formRef.value.form.breadth, formRef.value.form.depth)
+    deepResearchRef.value?.startResearch(
+      getCombinedQuery(),
+      formRef.value.form.breadth,
+      formRef.value.form.depth,
+    )
   }
 
   async function generateReport(_researchResult: ResearchResult) {

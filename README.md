@@ -2,12 +2,9 @@
 
 This is a web UI for https://github.com/dzhng/deep-research. It supports streaming AI responses, and viasualization of the research process using a tree structure.
 
-Note: The project is currently WIP, expect bugs. README will be updated once the project is usable.
+> Note: The project is currently WIP, expect bugs.
 
-Rough preview of the UI: 
-
-<img width="1087" alt="image" src="https://github.com/user-attachments/assets/4bb5b722-0300-4d4f-bb01-fc1ed2404442" />
-
+<video src="https://github.com/user-attachments/assets/c3738551-b258-47c6-90a8-fd097e5165c8"></video>
 
 ## Setup
 
@@ -80,3 +77,7 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+## License
+
+MIT

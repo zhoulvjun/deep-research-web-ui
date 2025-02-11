@@ -1,5 +1,10 @@
 <script setup lang="ts">
-  import { deepResearch, type PartialSearchResult, type ResearchResult, type ResearchStep } from '~/lib/deep-research'
+  import {
+    deepResearch,
+    type PartialSearchResult,
+    type ResearchResult,
+    type ResearchStep,
+  } from '~/lib/deep-research'
   import type { TreeNode } from './Tree.vue'
 
   const emit = defineEmits<{
@@ -44,7 +49,10 @@
             tree.value.children.push(node)
           } else {
             // 找到父节点并添加
-            const parentNode = findNode(tree.value, getParentNodeId(step.nodeId))
+            const parentNode = findNode(
+              tree.value,
+              getParentNodeId(step.nodeId),
+            )
             if (parentNode) {
               parentNode.children.push(node)
             }
@@ -160,7 +168,8 @@
     <template #header>
       <h2 class="font-bold">3. Web Browsing</h2>
       <p class="text-sm text-gray-500">
-        The AI will then search the web based on our research goal, and iterate until the depth is reached.
+        The AI will then search the web based on our research goal, and iterate
+        until the depth is reached.
         <br />
         Click a child node to view details.
       </p>
@@ -174,7 +183,9 @@
         <h2 class="text-xl font-bold mt-2">{{ selectedNode.label }}</h2>
 
         <!-- Root node has no additional information -->
-        <p v-if="selectedNode.id === '0'"> This is the beginning of your deep research journey! </p>
+        <p v-if="selectedNode.id === '0'">
+          This is the beginning of your deep research journey!
+        </p>
         <template v-else>
           <h3 class="text-lg font-semibold mt-2">Research Goal:</h3>
           <p>{{ selectedNode.researchGoal }}</p>
@@ -188,7 +199,11 @@
 
           <h3 class="text-lg font-semibold mt-2">Learnings:</h3>
           <ul class="list-disc list-inside">
-            <li v-for="(learning, index) in selectedNode.learnings" :key="index">{{ learning }}</li>
+            <li
+              v-for="(learning, index) in selectedNode.learnings"
+              :key="index"
+              >{{ learning }}</li
+            >
           </ul>
         </template>
       </div>

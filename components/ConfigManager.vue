@@ -8,7 +8,7 @@
     data: OpenAICompatibleModel[]
   }
 
-  const { config, aiApiBase } = useConfigStore()
+  const { config, aiApiBase } = storeToRefs(useConfigStore())
   const { t } = useI18n()
 
   const showModal = ref(false)
@@ -26,36 +26,36 @@
     },
   ])
   const selectedAiProvider = computed(() =>
-    aiProviderOptions.value.find((o) => o.value === config.ai.provider),
+    aiProviderOptions.value.find((o) => o.value === config.value.ai.provider),
   )
 
   // Try to find available AI models based on selected provider
   const debouncedListAiModels = useDebounceFn(async () => {
-    if (!config.ai.apiKey) return
-    if (!aiApiBase || !aiApiBase.startsWith('http')) return
+    if (!config.value.ai.apiKey) return
+    if (!aiApiBase.value || !aiApiBase.value.startsWith('http')) return
 
     try {
       loadingAiModels.value = true
       const result: OpenAICompatibleModelsResponse = await $fetch(
-        `${aiApiBase}/models`,
+        `${aiApiBase.value}/models`,
         {
           headers: {
-            Authorization: `Bearer ${config.ai.apiKey}`,
+            Authorization: `Bearer ${config.value.ai.apiKey}`,
           },
         },
       )
       console.log(
-        `Found ${result.data.length} AI models for provider ${config.ai.provider}`,
+        `Found ${result.data.length} AI models for provider ${config.value.ai.provider}`,
       )
       aiModelOptions.value = result.data.map((m) => m.id)
       // Auto-select the current model
-      if (!aiModelOptions.value.includes(config.ai.model)) {
-        aiModelOptions.value.unshift(config.ai.model)
+      if (!aiModelOptions.value.includes(config.value.ai.model)) {
+        aiModelOptions.value.unshift(config.value.ai.model)
       }
     } catch (error) {
       console.error(`Fetch AI models failed`, error)
-      if (config.ai.model) {
-        aiModelOptions.value = [config.ai.model]
+      if (config.value.ai.model) {
+        aiModelOptions.value = [config.value.ai.model]
       } else {
         aiModelOptions.value = []
       }
@@ -65,9 +65,9 @@
 
   watch(
     () => [
-      config.ai.provider,
-      config.ai.apiKey,
-      config.ai.apiBase,
+      config.value.ai.provider,
+      config.value.ai.apiKey,
+      config.value.ai.apiBase,
       showModal.value,
     ],
     () => {

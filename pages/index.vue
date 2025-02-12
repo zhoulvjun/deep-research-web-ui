@@ -1,7 +1,7 @@
 <template>
   <div>
     <UContainer>
-      <div class="max-w-4xl mx-auto py-8 space-y-4">
+      <div class="max-w-4xl mx-auto py-8 flex flex-col gap-y-4">
         <div class="flex items-center gap-2">
           <h1 class="text-3xl font-bold text-center mb-2">
             Deep Research Assistant
@@ -32,11 +32,7 @@
           ref="feedbackRef"
           @submit="startDeepSearch"
         />
-        <DeepResearch
-          ref="deepResearchRef"
-          @complete="generateReport"
-          class="mb-8"
-        />
+        <DeepResearch ref="deepResearchRef" @complete="generateReport" />
         <ResearchReport ref="reportRef" />
       </div>
     </UContainer>

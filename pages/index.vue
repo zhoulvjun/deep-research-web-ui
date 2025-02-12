@@ -2,12 +2,15 @@
   <div>
     <UContainer>
       <div class="max-w-4xl mx-auto py-8 flex flex-col gap-y-4">
-        <div class="flex items-center gap-2">
+        <div class="flex flex-col sm:flex-row gap-2">
           <h1 class="text-3xl font-bold text-center mb-2">
             Deep Research Assistant
           </h1>
-          <ConfigManager ref="configManagerRef" class="ml-auto" />
-          <ColorModeButton />
+          <div class="mx-auto sm:ml-auto sm:mr-0 flex items-center gap-2">
+            <GitHubButton />
+            <ConfigManager ref="configManagerRef" />
+            <ColorModeButton />
+          </div>
         </div>
 
         <div>

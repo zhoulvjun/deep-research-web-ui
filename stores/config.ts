@@ -1,4 +1,4 @@
-import {} from '@pinia/nuxt'
+import { skipHydrate } from 'pinia'
 
 export type ConfigAiProvider = 'openai-compatible'
 export interface ConfigAi {
@@ -30,5 +30,5 @@ export const useConfigStore = defineStore('config', () => {
     },
   })
 
-  return { config }
+  return { config: skipHydrate(config) }
 })

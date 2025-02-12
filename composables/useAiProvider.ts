@@ -6,7 +6,7 @@ export const useAiModel = () => {
     case 'openai-compatible':
       const openai = createOpenAI({
         apiKey: config.config.ai.apiKey,
-        baseURL: config.config.ai.apiBase || 'https://api.openai.com/v1', // TODO: better default
+        baseURL: config.aiApiBase,
       })
       return openai(config.config.ai.model)
     default:

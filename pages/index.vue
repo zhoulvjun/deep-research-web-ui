@@ -55,7 +55,7 @@
   import type { ResearchResult } from '~/lib/deep-research'
 
   const { t } = useI18n()
-  const config = useConfigStore()
+  const { config } = useConfigStore()
   const toast = useToast()
 
   const configManagerRef = ref<InstanceType<typeof ConfigManager>>()
@@ -77,8 +77,8 @@ ${feedback.value
   }
 
   async function generateFeedback(data: ResearchInputData) {
-    const aiConfig = config.config.ai
-    const webSearchConfig = config.config.webSearch
+    const aiConfig = config.ai
+    const webSearchConfig = config.webSearch
 
     if (!aiConfig.model || !aiConfig.apiKey || !webSearchConfig.apiKey) {
       toast.add({

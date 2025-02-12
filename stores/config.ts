@@ -30,5 +30,9 @@ export const useConfigStore = defineStore('config', () => {
     },
   })
 
-  return { config: skipHydrate(config) }
+  const aiApiBase = computed(() => {
+    return config.value.ai.apiBase || 'https://api.openai.com/v1'
+  })
+
+  return { config: skipHydrate(config), aiApiBase }
 })

@@ -1,8 +1,19 @@
 <script setup lang="ts">
-  const { config } = useConfigStore()
+  interface OpenAICompatibleModel {
+    id: string
+    object: string
+  }
+  interface OpenAICompatibleModelsResponse {
+    object: string
+    data: OpenAICompatibleModel[]
+  }
+
+  const { config, aiApiBase } = useConfigStore()
   const { t } = useI18n()
 
   const showModal = ref(false)
+  const loadingAiModels = ref(false)
+  const aiModelOptions = ref<string[]>([])
 
   const aiProviderOptions = computed(() => [
     {
@@ -16,6 +27,54 @@
   ])
   const selectedAiProvider = computed(() =>
     aiProviderOptions.value.find((o) => o.value === config.ai.provider),
+  )
+
+  // Try to find available AI models based on selected provider
+  const debouncedListAiModels = useDebounceFn(async () => {
+    if (!config.ai.apiKey) return
+    if (!aiApiBase || !aiApiBase.startsWith('http')) return
+
+    try {
+      loadingAiModels.value = true
+      const result: OpenAICompatibleModelsResponse = await $fetch(
+        `${aiApiBase}/models`,
+        {
+          headers: {
+            Authorization: `Bearer ${config.ai.apiKey}`,
+          },
+        },
+      )
+      console.log(
+        `Found ${result.data.length} AI models for provider ${config.ai.provider}`,
+      )
+      aiModelOptions.value = result.data.map((m) => m.id)
+      // Auto-select the current model
+      if (!aiModelOptions.value.includes(config.ai.model)) {
+        aiModelOptions.value.unshift(config.ai.model)
+      }
+    } catch (error) {
+      console.error(`Fetch AI models failed`, error)
+      if (config.ai.model) {
+        aiModelOptions.value = [config.ai.model]
+      } else {
+        aiModelOptions.value = []
+      }
+    }
+    loadingAiModels.value = false
+  }, 1000)
+
+  watch(
+    () => [
+      config.ai.provider,
+      config.ai.apiKey,
+      config.ai.apiBase,
+      showModal.value,
+    ],
+    () => {
+      if (!showModal.value) return
+      debouncedListAiModels()
+    },
+    { immediate: true },
   )
 
   defineExpose({
@@ -58,11 +117,15 @@
                 :placeholder="selectedAiProvider?.apiBasePlaceholder"
               />
             </UFormField>
-            <UFormField label="Model" required>
-              <UInput
+            <UFormField :label="$t('settings.ai.model')" required>
+              <UInputMenu
                 v-model="config.ai.model"
                 class="w-full"
-                placeholder="Model name"
+                :items="aiModelOptions"
+                :placeholder="$t('settings.ai.model')"
+                :loading="loadingAiModels"
+                create-item
+                @create="aiModelOptions.push($event)"
               />
             </UFormField>
           </div>

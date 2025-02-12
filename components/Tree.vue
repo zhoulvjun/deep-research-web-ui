@@ -61,7 +61,7 @@
   <div class="flex items-center gap-1">
     <UIcon name="i-lucide-circle-dot" />
     <UButton
-      :class="icon.pulse && 'animate-pulse'"
+      :class="['max-w-90 shrink-0', icon.pulse && 'animate-pulse']"
       :icon="icon.name"
       size="sm"
       :color="selectedNode?.id === node.id ? 'primary' : 'info'"

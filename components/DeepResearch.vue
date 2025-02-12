@@ -6,14 +6,16 @@
     type ResearchStep,
   } from '~/lib/deep-research'
   import type { TreeNode } from './Tree.vue'
+  import { marked } from 'marked'
 
+  const { t } = useI18n()
   const emit = defineEmits<{
     (e: 'complete', results: ResearchResult): void
   }>()
 
   const tree = ref<TreeNode>({
     id: '0',
-    label: 'Start',
+    label: t('webBrowsing.startNode.label'),
     children: [],
   })
   const selectedNode = ref<TreeNode>()
@@ -38,8 +40,8 @@
           // 创建新节点
           node = {
             id: nodeId,
-            label: 'Generating...',
-            researchGoal: 'Generating research goal...',
+            label: t('webBrowsing.generating'),
+            researchGoal: t('webBrowsing.generating'),
             learnings: [],
             children: [],
           }
@@ -60,7 +62,7 @@
         }
         // 更新节点的查询内容
         if (step.result) {
-          node.label = step.result.query ?? 'Generating...'
+          node.label = step.result.query ?? t('webBrowsing.generating')
           node.researchGoal = step.result.researchGoal
         }
         break
@@ -166,12 +168,11 @@
 <template>
   <UCard>
     <template #header>
-      <h2 class="font-bold">3. Web Browsing</h2>
+      <h2 class="font-bold">{{ t('webBrowsing.title') }}</h2>
       <p class="text-sm text-gray-500">
-        The AI will then search the web based on our research goal, and iterate
-        until the depth is reached.
+        {{ t('webBrowsing.description') }}
         <br />
-        Click a child node to view details.
+        {{ t('webBrowsing.clickToView') }}
       </p>
     </template>
     <div class="flex flex-col">
@@ -179,31 +180,44 @@
         <Tree :node="tree" :selected-node="selectedNode" @select="selectNode" />
       </div>
       <div v-if="selectedNode" class="p-4">
-        <USeparator label="Node Details" />
+        <USeparator :label="t('webBrowsing.nodeDetails')" />
         <h2 class="text-xl font-bold mt-2">{{ selectedNode.label }}</h2>
 
         <!-- Root node has no additional information -->
         <p v-if="selectedNode.id === '0'">
-          This is the beginning of your deep research journey!
+          {{ t('webBrowsing.startNode.description') }}
         </p>
         <template v-else>
-          <h3 class="text-lg font-semibold mt-2">Research Goal:</h3>
+          <h3 class="text-lg font-semibold mt-2">
+            {{ t('webBrowsing.researchGoal') }}
+          </h3>
           <p>{{ selectedNode.researchGoal }}</p>
 
-          <h3 class="text-lg font-semibold mt-2">Visited URLs:</h3>
+          <h3 class="text-lg font-semibold mt-2">
+            {{ t('webBrowsing.visitedUrls') }}
+          </h3>
           <ul class="list-disc list-inside">
             <li v-for="(url, index) in selectedNode.visitedUrls" :key="index">
-              <ULink :href="url" target="_blank">{{ url }}</ULink>
+              <UButton
+                class="!p-0 break-all whitespace-pre-wrap"
+                variant="link"
+                :href="url"
+                target="_blank"
+              >
+                {{ url }}
+              </UButton>
             </li>
           </ul>
 
-          <h3 class="text-lg font-semibold mt-2">Learnings:</h3>
+          <h3 class="text-lg font-semibold mt-2">
+            {{ t('webBrowsing.learnings') }}
+          </h3>
           <ul class="list-disc list-inside">
             <li
               v-for="(learning, index) in selectedNode.learnings"
               :key="index"
-              >{{ learning }}</li
-            >
+              v-html="marked(learning)"
+            ></li>
           </ul>
         </template>
       </div>

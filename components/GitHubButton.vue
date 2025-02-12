@@ -6,6 +6,5 @@
     to="https://github.com/AnotiaWang/deep-research-web-ui"
     target="_blank"
   >
-    GitHub
   </UButton>
 </template>

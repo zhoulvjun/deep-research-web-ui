@@ -1,0 +1,74 @@
+{
+  "language": "中文",
+  "index": {
+    "projectDescription": "Deep Research 是 {0} 的可视化 UI，可以让 AI 根据特定问题联网搜索并自行深挖，并输出研究报告。\n本项目可以流式传输 AI 的回答来实时反馈，并使用树状结构可视化搜索过程。\n全部 API 请求都在浏览器本地完成。",
+    "missingConfigTitle": "需要配置 API",
+    "missingConfigDescription": "本项目需要您自备 AI 和联网搜索服务的配置 (Bring Your Own Key)"
+  },
+  "settings": {
+    "title": "设置",
+    "disclaimer": "所有设置本地保存",
+    "save": "保存",
+    "ai": {
+      "provider": "AI 服务",
+      "apiKey": "API 密钥",
+      "apiBase": "API Base URL",
+      "model": "模型名称",
+      "contextSize": "上下文大小",
+      "contextSizeHelp": "上下文的最大大小（以 token 计）。这是将发送给模型的最大 token 数量。默认值为 128,000 个 token。",
+      "providers": {
+        "openaiCompatible": {
+          "title": "OpenAI Compatiible",
+          "description": "目前仅支持与 OpenAI 兼容的提供商，如 Gemini、Together AI、DeepSeek、SiliconCloud……",
+          "apiBasePlaceholder": "https://api.openai.com/v1"
+        }
+      }
+    },
+    "webSearch": {
+      "provider": "联网搜索服务",
+      "providerHelp": "目前仅支持 Tavily，每个月可以免费搜索 1000 次。\n请在 {0} 生成一个 API 密钥。",
+      "apiKey": "API 密钥"
+    }
+  },
+  "researchTopic": {
+    "title": "1. 研究主题",
+    "placeholder": "任何你想了解的内容...",
+    "numOfQuestions": "问题数量",
+    "numOfQuestionsHelp": "AI 询问你的问题数量。这些问题能让 AI 更好地了解你的研究目标。",
+    "depth": "研究深度 (Depth)",
+    "depthHelp": "联网搜索的迭代轮数。",
+    "breadth": "研究广度 (Breadth)",
+    "breadthHelp": "第一次迭代中的搜索次数。后续每轮迭代的搜索次数为上一轮的一半。",
+    "start": "开始研究",
+    "researching": "正在研究..."
+  },
+  "modelFeedback": {
+    "title": "2. 模型反馈",
+    "description": "AI 将会跟你确认一些细节，帮助你明确研究方向。",
+    "waiting": "等待模型反馈...",
+    "submit": "提交回答",
+    "error": "获取反馈失败：{0}"
+  },
+  "webBrowsing": {
+    "title": "3. 联网搜索",
+    "description": "AI 将根据上述信息联网搜索并自动迭代，直到迭代次数 = depth。",
+    "clickToView": "点击下面的节点查看搜索详情。",
+    "nodeDetails": "节点详情",
+    "startNode": {
+      "label": "Start",
+      "description": "这是本次研究的起点"
+    },
+    "researchGoal": "研究目标",
+    "visitedUrls": "访问网址",
+    "learnings": "结论",
+    "generating": "生成中..."
+  },
+  "researchReport": {
+    "title": "4. 研究报告",
+    "exportPdf": "导出 PDF",
+    "sources": "来源",
+    "waiting": "等待报告...",
+    "generating": "生成报告中...",
+    "error": "生成报告失败：{0}"
+  }
+}

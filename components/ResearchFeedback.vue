@@ -14,6 +14,7 @@
     (e: 'submit', feedback: ResearchFeedbackResult[]): void
   }>()
 
+  const { t } = useI18n()
   const feedback = ref<ResearchFeedbackResult[]>([])
 
   const isLoading = ref(false)
@@ -52,7 +53,7 @@
       }
     } catch (e: any) {
       console.error('Error getting feedback:', e)
-      error.value = e.message
+      error.value = t('modelFeedback.error', [e.message])
     } finally {
       isLoading.value = false
     }
@@ -73,16 +74,15 @@
 <template>
   <UCard>
     <template #header>
-      <h2 class="font-bold">2. Model Feedback</h2>
+      <h2 class="font-bold">{{ $t('modelFeedback.title') }}</h2>
       <p class="text-sm text-gray-500">
-        The AI will ask you some follow up questions to help you clarify the
-        research direction.
+        {{ $t('modelFeedback.description') }}
       </p>
     </template>
 
     <div class="flex flex-col gap-2">
       <p v-if="error" class="text-red-500">{{ error }}</p>
-      <div v-if="!feedback.length && !error">Waiting for model feedback...</div>
+      <div v-if="!feedback.length && !error">{{ $t('modelFeedback.waiting') }}</div>
       <template v-else>
         <div v-if="error" class="text-red-500">{{ error }}</div>
         <div
@@ -90,7 +90,7 @@
           class="flex flex-col gap-2"
           :key="index"
         >
-          Assistant: {{ feedback.assistantQuestion }}
+          {{ feedback.assistantQuestion }}
           <UInput v-model="feedback.userAnswer" />
         </div>
       </template>
@@ -101,7 +101,7 @@
         block
         @click="$emit('submit', feedback)"
       >
-        Submit Answer
+        {{ $t('modelFeedback.submit') }}
       </UButton>
     </div>
   </UCard>

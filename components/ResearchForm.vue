@@ -39,22 +39,24 @@
 <template>
   <UCard>
     <template #header>
-      <h2 class="font-bold">1. Research Topic</h2>
+      <h2 class="font-bold">{{ $t('researchTopic.title') }}</h2>
     </template>
     <div class="flex flex-col gap-2">
-      <UFormField label="Research Topic" required>
+      <UFormField :label="$t('researchTopic.title')" required>
         <UTextarea
           class="w-full"
           v-model="form.query"
           :rows="3"
-          placeholder="Enter whatever you want to research..."
+          :placeholder="$t('researchTopic.placeholder')"
           required
         />
       </UFormField>
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <UFormField label="Number of Questions" required>
-          <template #help> Number of questions for you to clarify. </template>
+        <UFormField :label="$t('researchTopic.numOfQuestions')" required>
+          <template #help>
+            {{ $t('researchTopic.numOfQuestionsHelp') }}
+          </template>
           <UInput
             v-model="form.numQuestions"
             class="w-full"
@@ -65,8 +67,8 @@
           />
         </UFormField>
 
-        <UFormField label="Depth" required>
-          <template #help> How deep you want to dig. </template>
+        <UFormField :label="$t('researchTopic.depth')" required>
+          <template #help>{{ $t('researchTopic.depthHelp') }}</template>
           <UInput
             v-model="form.depth"
             class="w-full"
@@ -77,8 +79,8 @@
           />
         </UFormField>
 
-        <UFormField label="Breadth" required>
-          <template #help> Number of searches in each depth. </template>
+        <UFormField :label="$t('researchTopic.breadth')" required>
+          <template #help>{{ $t('researchTopic.breadthHelp') }}</template>
           <UInput
             v-model="form.breadth"
             class="w-full"
@@ -100,7 +102,7 @@
         block
         @click="handleSubmit"
       >
-        {{ isLoadingFeedback ? 'Researching...' : 'Start Research' }}
+        {{ isLoadingFeedback ? 'Researching...' : $t('researchTopic.start') }}
       </UButton>
     </template>
   </UCard>

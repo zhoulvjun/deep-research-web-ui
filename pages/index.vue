@@ -3,27 +3,29 @@
     <UContainer>
       <div class="max-w-4xl mx-auto py-8 flex flex-col gap-y-4">
         <div class="flex flex-col sm:flex-row gap-2">
-          <h1 class="text-3xl font-bold text-center mb-2">
-            Deep Research Assistant
-          </h1>
+          <h1 class="text-3xl font-bold text-center mb-2"> Deep Research </h1>
           <div class="mx-auto sm:ml-auto sm:mr-0 flex items-center gap-2">
             <GitHubButton />
             <ConfigManager ref="configManagerRef" />
             <ColorModeButton />
+            <LangSwitcher />
           </div>
         </div>
 
-        <div>
-          This is a web UI for
-          <ULink target="_blank" href="https://github.com/dzhng/deep-research">
+        <i18n-t
+          class="whitespace-pre-wrap"
+          keypath="index.projectDescription"
+          tag="p"
+        >
+          <UButton
+            class="!p-0"
+            variant="link"
+            href="https://github.com/dzhng/deep-research"
+            target="_blank"
+          >
             dzhng/deep-research
-          </ULink>
-          . It features streaming AI responses for realtime feedback, and
-          viasualization of the research process using a tree structure.
-          <br />
-          All API requests are directly sent from your browser. No remote data
-          stored.
-        </div>
+          </UButton>
+        </i18n-t>
 
         <ResearchForm
           :is-loading-feedback="!!feedbackRef?.isLoading"
@@ -52,6 +54,7 @@
   import type { ResearchFeedbackResult } from '~/components/ResearchFeedback.vue'
   import type { ResearchResult } from '~/lib/deep-research'
 
+  const { t } = useI18n()
   const config = useConfigStore()
   const toast = useToast()
 
@@ -79,8 +82,8 @@ ${feedback.value
 
     if (!aiConfig.model || !aiConfig.apiKey || !webSearchConfig.apiKey) {
       toast.add({
-        title: 'Config not set',
-        description: 'Please configure AI and Web Search settings.',
+        title: t('index.missingConfigTitle'),
+        description: t('index.missingConfigDescription'),
         color: 'error',
       })
       configManagerRef.value?.show()

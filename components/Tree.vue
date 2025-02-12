@@ -27,14 +27,19 @@
   const icon = computed(() => {
     const result = { name: '', pulse: false }
     if (!props.node.status) return result
+
     switch (props.node.status) {
       case 'generating_query':
         result.name = 'i-lucide-clipboard-list'
         result.pulse = true
         break
       case 'generated_query':
-        result.name = 'i-lucide-pause'
-        break
+        // FIXME: 因为 deepResearch 有并发限制，这个 case 是为了明确区分状态。
+        // 但是目前进入这个状态之后再进入 searching 状态，图标不会更新成 search，不知道原因
+        // 暂时禁用了这个 case
+        // result.name = 'i-lucide-pause'
+        // result.pulse = true
+        // break
       case 'searching':
         result.name = 'i-lucide-search'
         result.pulse = true
@@ -70,7 +75,7 @@
     >
       {{ node.label }}
     </UButton>
-    <ol v-if="node.children.length > 0" class="flex flex-col gap-x-2">
+    <ol v-if="node.children.length > 0" class="flex flex-col gap-y-2">
       <li v-for="node in node.children" :key="node.id">
         <Tree
           class="ml-2"

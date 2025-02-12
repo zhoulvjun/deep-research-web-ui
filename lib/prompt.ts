@@ -13,3 +13,18 @@ export const systemPrompt = () => {
   - Consider new technologies and contrarian ideas, not just the conventional wisdom.
   - You may use high levels of speculation or prediction, just flag it for me.`
 }
+
+/**
+ * Construct the language requirement prompt for LLMs.
+ * Placing this at the end of the prompt makes it easier for the LLM to pay attention to.
+ * @param language the language of the prompt, e.g. `English`
+ */
+export const languagePrompt = (language: string) => {
+  let languagePrompt = `- Respond in ${language}.`
+
+  if (language === '中文') {
+    languagePrompt +=
+      ' Add appropriate spaces between Chinese and Latin characters / numbers to improve readability.'
+  }
+  return languagePrompt
+}

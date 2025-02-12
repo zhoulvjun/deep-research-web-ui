@@ -37,15 +37,15 @@ export async function* parseStreamingJson<T extends z.ZodType>(
   let isParseSuccessful = false
 
   for await (const chunk of textStream) {
-    rawText = removeJsonMarkdown(rawText + chunk)
-    const parsed = parsePartialJson(rawText)
+    rawText += chunk
+    const parsed = parsePartialJson(removeJsonMarkdown(rawText))
 
     isParseSuccessful =
       parsed.state === 'repaired-parse' || parsed.state === 'successful-parse'
     if (isParseSuccessful && isValid(parsed.value as any)) {
       yield parsed.value as DeepPartial<z.infer<T>>
     } else {
-      console.dir(parsed, { depth: null, colors: true })
+      console.debug(`Failed to parse JSON:`, rawText)
     }
   }
 

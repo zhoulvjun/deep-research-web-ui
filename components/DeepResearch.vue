@@ -8,7 +8,7 @@
   import type { TreeNode } from './Tree.vue'
   import { marked } from 'marked'
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const emit = defineEmits<{
     (e: 'complete', results: ResearchResult): void
   }>()
@@ -150,6 +150,7 @@
         query,
         maxDepth: depth,
         breadth,
+        language: t('language', {}, { locale: locale.value }),
         onProgress: handleResearchProgress,
       })
     } catch (error) {
@@ -181,7 +182,7 @@
       </div>
       <div v-if="selectedNode" class="p-4">
         <USeparator :label="t('webBrowsing.nodeDetails')" />
-        <h2 class="text-xl font-bold mt-2">{{ selectedNode.label }}</h2>
+        <h2 class="text-xl font-bold my-2">{{ selectedNode.label }}</h2>
 
         <!-- Root node has no additional information -->
         <p v-if="selectedNode.id === '0'">
@@ -191,15 +192,23 @@
           <h3 class="text-lg font-semibold mt-2">
             {{ t('webBrowsing.researchGoal') }}
           </h3>
-          <p class="whitespace-pre-wrap">{{ selectedNode.researchGoal }}</p>
+          <p
+            v-if="selectedNode.researchGoal"
+            class="prose max-w-none"
+            v-html="marked(selectedNode.researchGoal, { gfm: true })"
+          />
 
           <h3 class="text-lg font-semibold mt-2">
             {{ t('webBrowsing.visitedUrls') }}
           </h3>
           <ul class="list-disc list-inside">
-            <li v-for="(url, index) in selectedNode.visitedUrls" :key="index">
+            <li
+              v-for="(url, index) in selectedNode.visitedUrls"
+              class="whitespace-pre-wrap break-all"
+              :key="index"
+            >
               <UButton
-                class="!p-0 break-all whitespace-pre-wrap"
+                class="!p-0 contents"
                 variant="link"
                 :href="url"
                 target="_blank"
@@ -212,13 +221,12 @@
           <h3 class="text-lg font-semibold mt-2">
             {{ t('webBrowsing.learnings') }}
           </h3>
-          <ul class="list-disc list-inside">
-            <li
-              v-for="(learning, index) in selectedNode.learnings"
-              :key="index"
-              v-html="marked(learning)"
-            ></li>
-          </ul>
+          <p
+            v-for="(learning, index) in selectedNode.learnings"
+            class="prose max-w-none"
+            :key="index"
+            v-html="marked(`- ${learning}`, { gfm: true })"
+          />
         </template>
       </div>
     </div>

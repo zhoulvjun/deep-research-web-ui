@@ -54,7 +54,7 @@
   import type { ResearchFeedbackResult } from '~/components/ResearchFeedback.vue'
   import type { ResearchResult } from '~/lib/deep-research'
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const { config } = useConfigStore()
   const toast = useToast()
 
@@ -113,6 +113,7 @@ ${feedback.value
       prompt: getCombinedQuery(),
       learnings: researchResult.value?.learnings ?? [],
       visitedUrls: researchResult.value?.visitedUrls ?? [],
+      language: t('language', {}, { locale: locale.value }),
     })
   }
 </script>

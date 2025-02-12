@@ -14,7 +14,7 @@
     (e: 'submit', feedback: ResearchFeedbackResult[]): void
   }>()
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const feedback = ref<ResearchFeedbackResult[]>([])
 
   const isLoading = ref(false)
@@ -37,6 +37,7 @@
       for await (const f of generateFeedback({
         query,
         numQuestions,
+        language: t('language', {}, { locale: locale.value }),
       })) {
         const questions = f.questions!.filter((s) => typeof s === 'string')
         // Incrementally update modelValue

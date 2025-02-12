@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { parseStreamingJson, type DeepPartial } from '~/utils/json'
 
 import { trimPrompt } from './ai/providers'
-import { systemPrompt } from './prompt'
+import { languagePrompt, systemPrompt } from './prompt'
 import zodToJsonSchema from 'zod-to-json-schema'
 import { type TavilySearchResponse } from '@tavily/core'
 import { useTavily } from '~/composables/useTavily'
@@ -18,6 +18,7 @@ export type ResearchResult = {
 export interface WriteFinalReportParams {
   prompt: string
   learnings: string[]
+  language: string
 }
 // useRuntimeConfig()
 // Used for streaming response
@@ -71,8 +72,10 @@ export function generateSearchQueries({
   query,
   numQueries = 3,
   learnings,
+  language,
 }: {
   query: string
+  language: string
   numQueries?: number
   // optional, if provided, the research will continue from the last learning
   learnings?: string[]
@@ -101,6 +104,7 @@ export function generateSearchQueries({
         )}`
       : '',
     `You MUST respond in JSON with the following schema: ${jsonSchema}`,
+    languagePrompt(language),
   ].join('\n\n')
   return streamText({
     model: useAiModel(),
@@ -118,9 +122,11 @@ function processSearchResult({
   result,
   numLearnings = 3,
   numFollowUpQuestions = 3,
+  language,
 }: {
   query: string
   result: TavilySearchResponse
+  language: string
   numLearnings?: number
   numFollowUpQuestions?: number
 }) {
@@ -135,15 +141,17 @@ function processSearchResult({
       ),
   })
   const jsonSchema = JSON.stringify(zodToJsonSchema(schema))
-  const contents = result.results.map((item) => item.content).filter(Boolean).map(
-    (content) => trimPrompt(content, 25_000),
-  )
+  const contents = result.results
+    .map((item) => item.content)
+    .filter(Boolean)
+    .map((content) => trimPrompt(content, 25_000))
   const prompt = [
     `Given the following contents from a SERP search for the query <query>${query}</query>, generate a list of learnings from the contents. Return a maximum of ${numLearnings} learnings, but feel free to return less if the contents are clear. Make sure each learning is unique and not similar to each other. The learnings should be concise and to the point, as detailed and information dense as possible. Make sure to include any entities like people, places, companies, products, things, etc in the learnings, as well as any exact metrics, numbers, or dates. The learnings will be used to research the topic further.`,
     `<contents>${contents
       .map((content) => `<content>\n${content}\n</content>`)
       .join('\n')}</contents>`,
     `You MUST respond in JSON with the following schema: ${jsonSchema}`,
+    languagePrompt(language),
   ].join('\n\n')
 
   return streamText({
@@ -157,6 +165,7 @@ function processSearchResult({
 export function writeFinalReport({
   prompt,
   learnings,
+  language,
 }: WriteFinalReportParams) {
   const learningsString = trimPrompt(
     learnings
@@ -169,7 +178,8 @@ export function writeFinalReport({
     `<prompt>${prompt}</prompt>`,
     `Here are all the learnings from previous research:`,
     `<learnings>\n${learningsString}\n</learnings>`,
-    `Write the report in Markdown.`,
+    `Write the report using Markdown.`,
+    languagePrompt(language),
     `## Deep Research Report`,
   ].join('\n\n')
 
@@ -188,6 +198,7 @@ export async function deepResearch({
   query,
   breadth,
   maxDepth,
+  language,
   learnings = [],
   visitedUrls = [],
   onProgress,
@@ -197,6 +208,7 @@ export async function deepResearch({
   query: string
   breadth: number
   maxDepth: number
+  language: string
   learnings?: string[]
   visitedUrls?: string[]
   onProgress: (step: ResearchStep) => void
@@ -208,6 +220,7 @@ export async function deepResearch({
       query,
       learnings,
       numQueries: breadth,
+      language,
     })
     const limit = pLimit(ConcurrencyLimit)
 
@@ -242,22 +255,18 @@ export async function deepResearch({
     const results = await Promise.all(
       searchQueries.map((searchQuery, i) =>
         limit(async () => {
-          if (!searchQuery?.query)
+          if (!searchQuery?.query) {
             return {
               learnings: [],
               visitedUrls: [],
             }
+          }
           onProgress({
             type: 'searching',
             query: searchQuery.query,
             nodeId: childNodeId(nodeId, i),
           })
           try {
-            // const result = await firecrawl.search(searchQuery.query, {
-            //   timeout: 15000,
-            //   limit: 5,
-            //   scrapeOptions: { formats: ['markdown'] },
-            // });
             const result = await useTavily().search(searchQuery.query, {
               maxResults: 5,
             })
@@ -266,7 +275,9 @@ export async function deepResearch({
             )
 
             // Collect URLs from this search
-            const newUrls = result.results.map((item) => item.url).filter(Boolean)
+            const newUrls = result.results
+              .map((item) => item.url)
+              .filter(Boolean)
             onProgress({
               type: 'search_complete',
               urls: newUrls,
@@ -279,6 +290,7 @@ export async function deepResearch({
               query: searchQuery.query,
               result,
               numFollowUpQuestions: nextBreadth,
+              language,
             })
             let searchResult: PartialSearchResult = {}
 
@@ -317,7 +329,7 @@ export async function deepResearch({
             })
 
             if (
-              nextDepth < maxDepth &&
+              nextDepth <= maxDepth &&
               searchResult.followUpQuestions?.length
             ) {
               console.warn(
@@ -340,6 +352,7 @@ export async function deepResearch({
                 onProgress,
                 currentDepth: nextDepth,
                 nodeId: childNodeId(nodeId, i),
+                language,
               })
             } else {
               return {

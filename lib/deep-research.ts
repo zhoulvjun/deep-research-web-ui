@@ -268,7 +268,7 @@ export async function deepResearch({
           })
           try {
             const result = await useTavily().search(searchQuery.query, {
-              maxResults: 1,
+              maxResults: 5,
             })
             console.log(
               `Ran ${searchQuery.query}, found ${result.results.length} contents`,

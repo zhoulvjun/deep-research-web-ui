@@ -4,12 +4,15 @@
     writeFinalReport,
     type WriteFinalReportParams,
   } from '~/lib/deep-research'
+  import jsPDF from 'jspdf'
 
   interface CustomReportParams extends WriteFinalReportParams {
     visitedUrls: string[]
   }
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const toast = useToast()
+
   const error = ref('')
   const loading = ref(false)
   const loadingExportPdf = ref(false)
@@ -20,6 +23,7 @@
   const isExportButtonDisabled = computed(
     () => !reportContent.value || loading.value || loadingExportPdf.value,
   )
+  let pdf: jsPDF | undefined
 
   async function generateReport(params: CustomReportParams) {
     loading.value = true
@@ -44,49 +48,88 @@
     const element = document.getElementById('report-content')
     if (!element) return
 
-    // Create a temp container
-    const tempContainer = document.createElement('div')
     loadingExportPdf.value = true
 
     try {
-      // Dinamically import html2pdf
-      // @ts-ignore
-      const html2pdf = (await import('html2pdf.js')).default
-
-      tempContainer.innerHTML = element.innerHTML
-      tempContainer.className = element.className
-
-      // Use print-friendly styles
-      tempContainer.style.cssText = `
-        font-family: Arial, sans-serif;
-        color: black;
-        background-color: white;
-        padding: 20px;
-      `
-
-      document.body.appendChild(tempContainer)
-
-      const opt = {
-        margin: [10, 10],
-        filename: 'research-report.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: '#ffffff',
-        },
-        jsPDF: {
+      // 创建 PDF 实例
+      if (!pdf) {
+        pdf = new jsPDF({
+          orientation: 'portrait',
           unit: 'mm',
           format: 'a4',
-          orientation: 'portrait',
-        },
+        })
       }
 
-      await html2pdf().set(opt).from(tempContainer).save()
+      // Load Chinese font
+      if (locale.value === 'zh') {
+        try {
+          if (!pdf.getFontList().SourceHanSans?.length) {
+            toast.add({
+              title: t('researchReport.downloadingFonts'),
+              duration: 5000,
+              color: 'info',
+            })
+            const fontUrl = '/fonts/SourceHanSansCN-VF.ttf'
+            pdf.addFont(fontUrl, 'SourceHanSans', 'normal')
+            pdf.setFont('SourceHanSans')
+          }
+        } catch (e: any) {
+          toast.add({
+            title: t('researchReport.downloadFontFailed'),
+            description: e.message,
+            duration: 8000,
+            color: 'error',
+          })
+          console.warn(
+            'Failed to load Chinese font, fallback to default font:',
+            e,
+          )
+        }
+      }
+
+      // 设置字体大小和行高
+      const fontSize = 10.5
+      const lineHeight = 1.5
+      pdf.setFontSize(fontSize)
+
+      // 设置页面边距（单位：mm）
+      const margin = {
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20,
+      }
+
+      // 获取纯文本内容
+      const content = element.innerText
+
+      // 计算可用宽度（mm）
+      const pageWidth = pdf.internal.pageSize.getWidth()
+      const maxWidth = pageWidth - margin.left - margin.right
+
+      // 分割文本为行
+      const lines = pdf.splitTextToSize(content, maxWidth)
+
+      // 计算当前位置
+      let y = margin.top
+
+      // 逐行添加文本
+      for (const line of lines) {
+        // 检查是否需要新页
+        if (y > pdf.internal.pageSize.getHeight() - margin.bottom) {
+          pdf.addPage()
+          y = margin.top
+        }
+
+        // 添加文本
+        pdf.text(line, margin.left, y)
+        y += fontSize * lineHeight
+      }
+
+      pdf.save('research-report.pdf')
     } catch (error) {
       console.error('Export to PDF failed:', error)
     } finally {
-      document.body.removeChild(tempContainer)
       loadingExportPdf.value = false
     }
   }

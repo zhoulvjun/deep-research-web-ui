@@ -69,6 +69,8 @@
     "sources": "Sources",
     "waiting": "Waiting for report...",
     "generating": "Generating report...",
-    "error": "Generate report failed: {0}"
+    "error": "Generate report failed: {0}",
+    "downloadingFonts": "Downloading necessary fonts, this may take some time...",
+    "downloadFontFailed": "Download font failed"
   }
 }

@@ -69,6 +69,8 @@
     "sources": "来源",
     "waiting": "等待报告...",
     "generating": "生成报告中...",
-    "error": "生成报告失败：{0}"
+    "error": "生成报告失败：{0}",
+    "downloadingFonts": "正在下载必要字体，可能需要较长时间...",
+    "downloadFontFailed": "下载字体失败"
   }
 }

@@ -1,5 +1,4 @@
 import { streamText } from 'ai'
-import { compact } from 'lodash-es'
 import pLimit from 'p-limit'
 import { z } from 'zod'
 import { parseStreamingJson, type DeepPartial } from '~/utils/json'
@@ -136,7 +135,7 @@ function processSearchResult({
       ),
   })
   const jsonSchema = JSON.stringify(zodToJsonSchema(schema))
-  const contents = compact(result.results.map((item) => item.content)).map(
+  const contents = result.results.map((item) => item.content).filter(Boolean).map(
     (content) => trimPrompt(content, 25_000),
   )
   const prompt = [
@@ -267,7 +266,7 @@ export async function deepResearch({
             )
 
             // Collect URLs from this search
-            const newUrls = compact(result.results.map((item) => item.url))
+            const newUrls = result.results.map((item) => item.url).filter(Boolean)
             onProgress({
               type: 'search_complete',
               urls: newUrls,

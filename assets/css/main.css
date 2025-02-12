@@ -5,5 +5,7 @@
 @import 'tailwindcss/preflight' layer(base);
 @import 'tailwindcss/utilities' layer(utilities);
 
+@plugin '@tailwindcss/typography';
+
 /* Then import "@nuxt/ui": */
 @import '@nuxt/ui';

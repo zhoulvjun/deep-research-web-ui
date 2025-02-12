@@ -101,7 +101,7 @@
           </UFormField>
           <div
             v-if="config.ai.provider === 'openai-compatible'"
-            class="space-y-2"
+            class="flex flex-col gap-y-2"
           >
             <UFormField :label="$t('settings.ai.apiKey')" required>
               <PasswordInput

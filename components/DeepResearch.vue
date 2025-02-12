@@ -191,7 +191,7 @@
           <h3 class="text-lg font-semibold mt-2">
             {{ t('webBrowsing.researchGoal') }}
           </h3>
-          <p>{{ selectedNode.researchGoal }}</p>
+          <p class="whitespace-pre-wrap">{{ selectedNode.researchGoal }}</p>
 
           <h3 class="text-lg font-semibold mt-2">
             {{ t('webBrowsing.visitedUrls') }}

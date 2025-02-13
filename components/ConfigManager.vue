@@ -63,6 +63,11 @@
     loadingAiModels.value = false
   }, 1000)
 
+  function createAndSelectAiModel(model: string) {
+    aiModelOptions.value.push(model)
+    config.value.ai.model = model
+  }
+
   watch(
     () => [
       config.value.ai.provider,
@@ -125,7 +130,7 @@
                 :placeholder="$t('settings.ai.model')"
                 :loading="loadingAiModels"
                 create-item
-                @create="aiModelOptions.push($event)"
+                @create="createAndSelectAiModel"
               />
             </UFormField>
           </div>

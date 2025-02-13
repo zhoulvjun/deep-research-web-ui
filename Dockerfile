@@ -5,12 +5,10 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN npm i -g --force pnpm@9
 RUN pnpm install --frozen-lockfile
-# Remove unused encodings from `js-tiktoken`
-RUN node scripts/cleanup-js-tiktoken.js
 
 COPY . .
 ENV NODE_OPTIONS="--max_old_space_size=2048"
-RUN pnpm build
+RUN pnpm build:optimize
 
 FROM node:20-alpine AS runner
 

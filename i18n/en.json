@@ -32,6 +32,7 @@
   },
   "researchTopic": {
     "title": "1. Research Topic",
+    "inputTitle": "Research Topic",
     "placeholder": "Whatever you want to research...",
     "numOfQuestions": "Number of Questions",
     "numOfQuestionsHelp": "The number of follow-up questions to clarify.",

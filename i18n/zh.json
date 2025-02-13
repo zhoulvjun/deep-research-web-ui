@@ -32,6 +32,7 @@
   },
   "researchTopic": {
     "title": "1. 研究主题",
+    "inputTitle": "研究主题",
     "placeholder": "任何你想了解的内容...",
     "numOfQuestions": "问题数量",
     "numOfQuestionsHelp": "AI 询问你的问题数量。这些问题能让 AI 更好地了解你的研究目标。",

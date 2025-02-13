@@ -42,7 +42,7 @@
       <h2 class="font-bold">{{ $t('researchTopic.title') }}</h2>
     </template>
     <div class="flex flex-col gap-2">
-      <UFormField :label="$t('researchTopic.title')" required>
+      <UFormField :label="$t('researchTopic.inputTitle')" required>
         <UTextarea
           class="w-full"
           v-model="form.query"

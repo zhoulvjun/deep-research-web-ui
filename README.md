@@ -4,12 +4,14 @@ This is a web UI for https://github.com/dzhng/deep-research.
 
 Features:
 
-- Stream AI responses for realtime feedback
-- Viasualization of the research process using a tree structure
-- Export research report as PDF
-- Bring Your Own API Key: Everything (config, API requests, ...) happens in your browser
+- **Realtime feedback**: Stream AI responses and reflect on the UI in real-time
+- **Search visualization**: Shows the research process using a tree structure
+- **Export as PDF**: Export the final research report as a PDF
+- **Bring Your Own API Key**: Everything (config, API requests, ...) happens in your browser
+- **Supports more models**: Uses plain prompts instead of newer, less widely supported features like Structured Outputs. This ensures to work with more providers that haven't caught up with the latest OpenAI capabilities.
 
 Currently available providers:
+
 - AI: OpenAI compatible
 - Web Search: Tavily (similar to Firecrawl, but with more free quota (1000 credits / month))
 
@@ -24,11 +26,13 @@ Live demo: <a href="https://deep-research.ataw.top" target="_blank">https://deep
 ### Self hosted
 
 Use pre-built Docker image:
+
 ```bash
 docker run -p 3000:3000 --name deep-research-web -d anotia/deep-research-web:latest
 ```
 
 Use self-built Docker image:
+
 ```
 git clone https://github.com/AnotiaWang/deep-research-web-ui
 cd deep-research-web-ui
@@ -62,11 +66,13 @@ pnpm dev
 Build the application for production:
 
 If you want to deploy a SSR application:
+
 ```bash
 pnpm build
 ```
 
 If you want to deploy a static, SSG application:
+
 ```bash
 pnpm generate
 ```

@@ -20,7 +20,7 @@ export const systemPrompt = () => {
  * @param language the language of the prompt, e.g. `English`
  */
 export const languagePrompt = (language: string) => {
-  let languagePrompt = `- Respond in ${language}.`
+  let languagePrompt = `Respond in ${language}.`
 
   if (language === '中文') {
     languagePrompt +=

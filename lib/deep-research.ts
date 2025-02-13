@@ -73,12 +73,15 @@ export function generateSearchQueries({
   numQueries = 3,
   learnings,
   language,
+  searchLanguage,
 }: {
   query: string
   language: string
   numQueries?: number
   // optional, if provided, the research will continue from the last learning
   learnings?: string[]
+  /** Force the LLM to generate serp queries in a certain language */
+  searchLanguage?: string
 }) {
   const schema = z.object({
     queries: z
@@ -95,7 +98,11 @@ export function generateSearchQueries({
       .describe(`List of SERP queries, max of ${numQueries}`),
   })
   const jsonSchema = JSON.stringify(zodToJsonSchema(schema))
+  let lp = languagePrompt(language)
 
+  if (searchLanguage !== language) {
+    lp += `Use ${searchLanguage} for the SERP queries.`
+  }
   const prompt = [
     `Given the following prompt from the user, generate a list of SERP queries to research the topic. Return a maximum of ${numQueries} queries, but feel free to return less if the original prompt is clear. Make sure each query is unique and not similar to each other: <prompt>${query}</prompt>\n\n`,
     learnings
@@ -104,7 +111,7 @@ export function generateSearchQueries({
         )}`
       : '',
     `You MUST respond in JSON with the following schema: ${jsonSchema}`,
-    languagePrompt(language),
+    lp,
   ].join('\n\n')
   return streamText({
     model: useAiModel(),
@@ -213,6 +220,7 @@ export async function deepResearch({
   onProgress,
   currentDepth = 1,
   nodeId = '0',
+  searchLanguage,
 }: {
   query: string
   breadth: number
@@ -223,6 +231,8 @@ export async function deepResearch({
   onProgress: (step: ResearchStep) => void
   currentDepth?: number
   nodeId?: string
+  /** Force the LLM to generate serp queries in a certain language */
+  searchLanguage?: string
 }): Promise<ResearchResult> {
   try {
     const searchQueriesResult = generateSearchQueries({
@@ -230,6 +240,7 @@ export async function deepResearch({
       learnings,
       numQueries: breadth,
       language,
+      searchLanguage,
     })
     const limit = pLimit(ConcurrencyLimit)
 

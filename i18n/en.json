@@ -27,7 +27,9 @@
     "webSearch": {
       "provider": "Web Search Provider",
       "providerHelp": "Currently only supports Tavily. It provides lots of free quota (1000 credits / month).\nGet one API key at {0}.",
-      "apiKey": "API Key"
+      "apiKey": "API Key",
+      "queryLanguage": "Query Language",
+      "queryLanguageHelp": "The language of the search query. Useful if you want to get search results in a different language.\nWhen writing conclusions, the AI model will still use the language same as the web UI."
     }
   },
   "researchTopic": {

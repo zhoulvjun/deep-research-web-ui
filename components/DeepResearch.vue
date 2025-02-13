@@ -9,6 +9,7 @@
   import { marked } from 'marked'
 
   const { t, locale } = useI18n()
+  const { config } = storeToRefs(useConfigStore())
   const emit = defineEmits<{
     (e: 'complete', results: ResearchResult): void
   }>()
@@ -146,11 +147,15 @@
     searchResults.value = {}
     isLoading.value = true
     try {
+      const searchLanguage = config.value.webSearch.searchLanguage
+        ? t('language', {}, { locale: config.value.webSearch.searchLanguage })
+        : undefined
       await deepResearch({
         query,
         maxDepth: depth,
         breadth,
         language: t('language', {}, { locale: locale.value }),
+        searchLanguage,
         onProgress: handleResearchProgress,
       })
     } catch (error) {

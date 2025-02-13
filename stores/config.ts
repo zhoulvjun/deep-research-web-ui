@@ -1,4 +1,5 @@
 import { skipHydrate } from 'pinia'
+import type { Locale } from '~/components/LangSwitcher.vue'
 
 export type ConfigAiProvider = 'openai-compatible'
 export interface ConfigAi {
@@ -11,6 +12,8 @@ export interface ConfigAi {
 export interface ConfigWebSearch {
   provider: 'tavily'
   apiKey?: string
+  /** Force the LLM to generate serp queries in a certain language */
+  searchLanguage?: Locale
 }
 
 export interface Config {

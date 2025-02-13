@@ -1,12 +1,13 @@
 # Deep Research Web UI
 
-This is a web UI for https://github.com/dzhng/deep-research.
+This is a web UI for https://github.com/dzhng/deep-research, with several improvements and fixes.
 
 Features:
 
 - **Realtime feedback**: Stream AI responses and reflect on the UI in real-time
 - **Search visualization**: Shows the research process using a tree structure
 - **Export as PDF**: Export the final research report as a PDF
+- **Search in different languages**: Useful when you want to get search results in a different language
 - **Bring Your Own API Key**: Everything (config, API requests, ...) happens in your browser
 - **Supports more models**: Uses plain prompts instead of newer, less widely supported features like Structured Outputs. This ensures to work with more providers that haven't caught up with the latest OpenAI capabilities.
 

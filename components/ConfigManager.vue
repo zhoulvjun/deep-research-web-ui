@@ -137,7 +137,7 @@
 
           <USeparator class="my-2" />
 
-          <!-- Web search provider -->
+          <!-- Web search -->
           <h3 class="font-bold"> {{ $t('settings.webSearch.provider') }} </h3>
           <UFormField>
             <template #help>
@@ -162,6 +162,20 @@
               v-model="config.webSearch.apiKey"
               class="w-full"
               :placeholder="$t('settings.webSearch.apiKey')"
+            />
+          </UFormField>
+          <UFormField :label="$t('settings.webSearch.queryLanguage')">
+            <template #help>
+              <i18n-t
+                class="whitespace-pre-wrap"
+                keypath="settings.webSearch.queryLanguageHelp"
+                tag="p"
+              />
+            </template>
+            <LangSwitcher
+              :value="config.webSearch.searchLanguage"
+              @update="config.webSearch.searchLanguage = $event"
+              private
             />
           </UFormField>
         </div>

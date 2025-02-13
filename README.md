@@ -86,6 +86,18 @@ yarn preview
 bun run preview
 ```
 
+### Docker
+
+Build the Docker image:
+```
+docker build -t deep-research-web .
+```
+
+Run the Docker image:
+```
+docker run -p 3000:3000 deep-research-web
+```
+
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 
 ## License

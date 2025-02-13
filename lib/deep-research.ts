@@ -110,6 +110,9 @@ export function generateSearchQueries({
     model: useAiModel(),
     system: systemPrompt(),
     prompt,
+    onError({ error }) {
+      throw error
+    },
   })
 }
 
@@ -159,6 +162,9 @@ function processSearchResult({
     abortSignal: AbortSignal.timeout(60_000),
     system: systemPrompt(),
     prompt,
+    onError({ error }) {
+      throw error
+    },
   })
 }
 
@@ -187,6 +193,9 @@ export function writeFinalReport({
     model: useAiModel(),
     system: systemPrompt(),
     prompt: _prompt,
+    onError({ error }) {
+      throw error
+    },
   })
 }
 

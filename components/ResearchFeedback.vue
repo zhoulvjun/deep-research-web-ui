@@ -54,6 +54,9 @@
       }
     } catch (e: any) {
       console.error('Error getting feedback:', e)
+      if (e.message.includes('Failed to fetch')) {
+        e.message += `\n${t('error.requestBlockedByCORS')}`
+      }
       error.value = t('modelFeedback.error', [e.message])
     } finally {
       isLoading.value = false
@@ -82,10 +85,13 @@
     </template>
 
     <div class="flex flex-col gap-2">
-      <p v-if="error" class="text-red-500">{{ error }}</p>
-      <div v-if="!feedback.length && !error">{{ $t('modelFeedback.waiting') }}</div>
+      <div v-if="!feedback.length && !error">
+        {{ $t('modelFeedback.waiting') }}
+      </div>
       <template v-else>
-        <div v-if="error" class="text-red-500">{{ error }}</div>
+        <div v-if="error" class="text-red-500 whitespace-pre-wrap">
+          {{ error }}
+        </div>
         <div
           v-for="(feedback, index) in feedback"
           class="flex flex-col gap-2"

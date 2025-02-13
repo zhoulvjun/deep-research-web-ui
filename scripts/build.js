@@ -10,7 +10,7 @@
  * 
  * So I wrote this script to override the encodings in `@tavily/core` to `o200k_base`
  * and clean up unused js-tiktoken encodings in the build output,
- * making the build output smaller by about 2 MB.
+ * making the build output smaller by about 3 MB.
 */
 
 import { execSync } from 'child_process';

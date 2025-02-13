@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import type { ButtonProps } from '@nuxt/ui'
   import type { ResearchStep } from '~/lib/deep-research'
 
   export type TreeNodeStatus = Exclude<ResearchStep['type'], 'complete'>
@@ -24,38 +25,43 @@
     (e: 'select', value: TreeNode): void
   }>()
 
-  const icon = computed(() => {
-    const result = { name: '', pulse: false }
+  const theme = computed(() => {
+    const result = {
+      icon: '',
+      pulse: false,
+      color: 'info' as ButtonProps['color'],
+    }
     if (!props.node.status) return result
 
     switch (props.node.status) {
       case 'generating_query':
-        result.name = 'i-lucide-clipboard-list'
+        result.icon = 'i-lucide-clipboard-list'
         result.pulse = true
         break
       case 'generated_query':
-        // FIXME: 因为 deepResearch 有并发限制，这个 case 是为了明确区分状态。
-        // 但是目前进入这个状态之后再进入 searching 状态，图标不会更新成 search，不知道原因
-        // 暂时禁用了这个 case
-        // result.name = 'i-lucide-pause'
-        // result.pulse = true
-        // break
+      // FIXME: 因为 deepResearch 有并发限制，这个 case 是为了明确区分状态。
+      // 但是目前进入这个状态之后再进入 searching 状态，图标不会更新成 search，不知道原因
+      // 暂时禁用了这个 case
+      // result.name = 'i-lucide-pause'
+      // result.pulse = true
+      // break
       case 'searching':
-        result.name = 'i-lucide-search'
+        result.icon = 'i-lucide-search'
         result.pulse = true
         break
       case 'search_complete':
-        result.name = 'i-lucide-search-check'
+        result.icon = 'i-lucide-search-check'
         break
       case 'processing_serach_result':
-        result.name = 'i-lucide-brain'
+        result.icon = 'i-lucide-brain'
         result.pulse = true
         break
       case 'processed_search_result':
-        result.name = 'i-lucide-circle-check-big'
+        result.icon = 'i-lucide-circle-check-big'
         break
       case 'error':
-        result.name = 'i-lucide-octagon-x'
+        result.icon = 'i-lucide-octagon-x'
+        result.color = 'error'
         break
     }
     return result
@@ -66,10 +72,10 @@
   <div class="flex items-center gap-1">
     <UIcon name="i-lucide-circle-dot" />
     <UButton
-      :class="['max-w-90 shrink-0', icon.pulse && 'animate-pulse']"
-      :icon="icon.name"
+      :class="['max-w-90 shrink-0', theme.pulse && 'animate-pulse']"
+      :icon="theme.icon"
       size="sm"
-      :color="selectedNode?.id === node.id ? 'primary' : 'info'"
+      :color="selectedNode?.id === node.id ? 'primary' : theme.color"
       :variant="selectedNode?.id === node.id ? 'soft' : 'outline'"
       @click="emit('select', node)"
     >

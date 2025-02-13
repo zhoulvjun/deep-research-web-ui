@@ -36,6 +36,9 @@ export function generateFeedback({
     model: useAiModel(),
     system: systemPrompt(),
     prompt,
+    onError({ error }) {
+      throw error
+    },
   })
 
   return parseStreamingJson(

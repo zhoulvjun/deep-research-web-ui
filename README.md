@@ -25,6 +25,10 @@ Live demo: <a href="https://deep-research.ataw.top" target="_blank">https://deep
 
 ### Self hosted
 
+One-click deploy with [EdgeOne Pages](https://edgeone.ai/products/pages):
+
+[![Deploy with EdgeOne Pages](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?from=github&template=https://github.com/AnotiaWang/deep-research-web-ui&from=github)
+
 Use pre-built Docker image:
 
 ```bash

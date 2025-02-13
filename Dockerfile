@@ -1,19 +1,21 @@
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm install --frozen-lockfile
+COPY package.json pnpm-lock.yaml ./
+RUN npm i -g --force pnpm@9
+RUN pnpm install --frozen-lockfile
 
 COPY . .
-RUN npm run build
+ENV NODE_OPTIONS="--max_old_space_size=2048"
+RUN pnpm build
 
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
+# We only need the `.output` directory, which contains everything the app needs to run
 COPY --from=builder /app/.output .output
-COPY --from=builder /app/node_modules node_modules
 COPY --from=builder /app/package.json .
 
 EXPOSE 3000

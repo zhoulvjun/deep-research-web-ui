@@ -259,6 +259,12 @@ export async function deepResearch({
       (value) => !!value.queries?.length && !!value.queries[0]?.query,
     )) {
       if (chunk.type === 'object' && chunk.value.queries) {
+        // Temporary fix: Exclude queries that equals `undefined`
+        // Currently only being reported to be seen on GPT-4o, where the model simply returns `undefined` for certain questions
+        // https://github.com/AnotiaWang/deep-research-web-ui/issues/7
+        searchQueries = chunk.value.queries.filter(
+          (q) => q.query !== 'undefined',
+        )
         for (let i = 0; i < searchQueries.length; i++) {
           onProgress({
             type: 'generating_query',
@@ -266,7 +272,6 @@ export async function deepResearch({
             nodeId: childNodeId(nodeId, i),
           })
         }
-        searchQueries = chunk.value.queries
       } else if (chunk.type === 'reasoning') {
         onProgress({
           type: 'generating_query_reasoning',

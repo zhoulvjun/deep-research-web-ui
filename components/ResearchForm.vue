@@ -102,7 +102,7 @@
         block
         @click="handleSubmit"
       >
-        {{ isLoadingFeedback ? 'Researching...' : $t('researchTopic.start') }}
+        {{ isLoadingFeedback ? $t('researchTopic.researching') : $t('researchTopic.start') }}
       </UButton>
     </template>
   </UCard>

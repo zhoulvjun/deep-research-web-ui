@@ -8,10 +8,10 @@ Features:
 
 - 🚀 **Safe & Secure**: Everything (config, API requests, ...) stays in your browser locally
 - 🕙 **Realtime feedback**: Stream AI responses and reflect on the UI in real-time
-- 🌳 **Search visualization**: Shows the research process using a tree structure
+- 🌳 **Search visualization**: Shows the research process using a tree structure. Supports searching in different languages
 - 📄 **Export as PDF**: Export the final research report as a PDF
-- 🌐 **Search in different languages**: Useful when you want to get search results in a different language
 - 🤖 **Supports more models**: Uses plain prompts instead of newer, less widely supported features like Structured Outputs. This ensures to work with more providers that haven't caught up with the latest OpenAI capabilities.
+- 🐳 **Docker support**: Deploy in your environment in one-line command
 
 Currently available providers:
 
@@ -20,7 +20,25 @@ Currently available providers:
 
 Please give a 🌟 Star if you like this project!
 
-<video src="https://github.com/user-attachments/assets/2f5a6f9c-18d1-4d40-9822-2de260d55dab" controls></video>
+<video width="500" src="https://github.com/user-attachments/assets/2f5a6f9c-18d1-4d40-9822-2de260d55dab" controls></video>
+
+## Recent updates
+
+25/02/14
+
+- Supported reasoning models like DeepSeek R1
+- Improved compatibility with more models & error handling
+
+25/02/13
+
+- Significantly reduced bundle size
+- Supported searching in different languages
+- Added Docker support
+- Fixed "export as PDF" issues
+
+25/02/12
+- Added Chinese translation. The models will respond in the user's language.
+- Various fixes
 
 ## How to use
 

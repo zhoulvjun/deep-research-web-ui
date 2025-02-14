@@ -1,5 +1,8 @@
 {
   "language": "English",
+  "modelThinking": "Thinking...",
+  "modelThinkingComplete": "Thinking complete",
+  "invalidStructuredOutput": "The model returned content which is incomplete or invalid and cannot be parsed. Try using a bigger or \"smarter\" model.",
   "index": {
     "projectDescription": "This is a web UI for {0} that allows AI to search online and dig deeper on its own based on specific questions, and then output a research report.\nThis project features streaming AI responses for realtime feedback, and visualization of the research process using a tree structure.\nAll API requests are directly sent from your browser. No remote data stored.",
     "missingConfigTitle": "Config not set",

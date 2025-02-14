@@ -28,7 +28,7 @@ export function generateFeedback({
   const jsonSchema = JSON.stringify(zodToJsonSchema(schema))
   const prompt = [
     `Given the following query from the user, ask ${numQuestions} follow up questions to clarify the research direction. Return a maximum of ${numQuestions} questions, but feel free to return less if the original query is clear: <query>${query}</query>`,
-    `You MUST respond in JSON with the following schema: ${jsonSchema}`,
+    `You MUST respond in JSON matching this JSON schema: ${jsonSchema}`,
     languagePrompt(language),
   ].join('\n\n')
 
@@ -37,12 +37,13 @@ export function generateFeedback({
     system: systemPrompt(),
     prompt,
     onError({ error }) {
+      console.error(`generateFeedback`, error)
       throw error
     },
   })
 
   return parseStreamingJson(
-    stream.textStream,
+    stream.fullStream,
     feedbackTypeSchema,
     (value: PartialFeedback) => !!value.questions && value.questions.length > 0,
   )

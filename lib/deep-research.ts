@@ -29,6 +29,7 @@ export type PartialSearchResult = DeepPartial<SearchResult>
 
 export type ResearchStep =
   | { type: 'generating_query'; result: PartialSearchQuery; nodeId: string }
+  | { type: 'generating_query_reasoning'; delta: string; nodeId: string }
   | {
       type: 'generated_query'
       query: string
@@ -41,6 +42,11 @@ export type ResearchStep =
       type: 'processing_serach_result'
       query: string
       result: PartialSearchResult
+      nodeId: string
+    }
+  | {
+      type: 'processing_serach_result_reasoning'
+      delta: string
       nodeId: string
     }
   | {
@@ -110,7 +116,7 @@ export function generateSearchQueries({
           '\n',
         )}`
       : '',
-    `You MUST respond in JSON with the following schema: ${jsonSchema}`,
+    `You MUST respond in JSON matching this JSON schema: ${jsonSchema}`,
     lp,
   ].join('\n\n')
   return streamText({
@@ -160,7 +166,7 @@ function processSearchResult({
     `<contents>${contents
       .map((content) => `<content>\n${content}\n</content>`)
       .join('\n')}</contents>`,
-    `You MUST respond in JSON with the following schema: ${jsonSchema}`,
+    `You MUST respond in JSON matching this JSON schema: ${jsonSchema}`,
     languagePrompt(language),
   ].join('\n\n')
 
@@ -234,6 +240,8 @@ export async function deepResearch({
   /** Force the LLM to generate serp queries in a certain language */
   searchLanguage?: string
 }): Promise<ResearchResult> {
+  const { t } = useNuxtApp().$i18n
+
   try {
     const searchQueriesResult = generateSearchQueries({
       query,
@@ -246,12 +254,12 @@ export async function deepResearch({
 
     let searchQueries: PartialSearchQuery[] = []
 
-    for await (const parsedQueries of parseStreamingJson(
-      searchQueriesResult.textStream,
+    for await (const chunk of parseStreamingJson(
+      searchQueriesResult.fullStream,
       searchQueriesTypeSchema,
       (value) => !!value.queries?.length && !!value.queries[0]?.query,
     )) {
-      if (parsedQueries.queries) {
+      if (chunk.type === 'object' && chunk.value.queries) {
         for (let i = 0; i < searchQueries.length; i++) {
           onProgress({
             type: 'generating_query',
@@ -259,7 +267,27 @@ export async function deepResearch({
             nodeId: childNodeId(nodeId, i),
           })
         }
-        searchQueries = parsedQueries.queries
+        searchQueries = chunk.value.queries
+      } else if (chunk.type === 'reasoning') {
+        onProgress({
+          type: 'generating_query_reasoning',
+          delta: chunk.delta,
+          nodeId,
+        })
+      } else if (chunk.type === 'error') {
+        onProgress({
+          type: 'error',
+          message: chunk.message,
+          nodeId,
+        })
+        break
+      } else if (chunk.type === 'bad-end') {
+        onProgress({
+          type: 'error',
+          message: t('invalidStructuredOutput'),
+          nodeId,
+        })
+        break
       }
     }
 
@@ -272,6 +300,7 @@ export async function deepResearch({
       })
     }
 
+    // Run in parallel and limit the concurrency
     const results = await Promise.all(
       searchQueries.map((searchQuery, i) =>
         limit(async () => {
@@ -287,6 +316,7 @@ export async function deepResearch({
             nodeId: childNodeId(nodeId, i),
           })
           try {
+            // Use Tavily to search the web
             const result = await useTavily().search(searchQuery.query, {
               maxResults: 5,
             })
@@ -314,18 +344,41 @@ export async function deepResearch({
             })
             let searchResult: PartialSearchResult = {}
 
-            for await (const parsedLearnings of parseStreamingJson(
-              searchResultGenerator.textStream,
+            for await (const chunk of parseStreamingJson(
+              searchResultGenerator.fullStream,
               searchResultTypeSchema,
               (value) => !!value.learnings?.length,
             )) {
-              searchResult = parsedLearnings
-              onProgress({
-                type: 'processing_serach_result',
-                result: parsedLearnings,
-                query: searchQuery.query,
-                nodeId: childNodeId(nodeId, i),
-              })
+              const id = childNodeId(nodeId, i)
+              if (chunk.type === 'object') {
+                searchResult = chunk.value
+                onProgress({
+                  type: 'processing_serach_result',
+                  result: chunk.value,
+                  query: searchQuery.query,
+                  nodeId: id,
+                })
+              } else if (chunk.type === 'reasoning') {
+                onProgress({
+                  type: 'processing_serach_result_reasoning',
+                  delta: chunk.delta,
+                  nodeId: id,
+                })
+              } else if (chunk.type === 'error') {
+                onProgress({
+                  type: 'error',
+                  message: chunk.message,
+                  nodeId: id,
+                })
+                break
+              } else if (chunk.type === 'bad-end') {
+                onProgress({
+                  type: 'error',
+                  message: t('invalidStructuredOutput'),
+                  nodeId: id,
+                })
+                break
+              }
             }
             console.log(
               `Processed search result for ${searchQuery.query}`,

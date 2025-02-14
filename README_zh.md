@@ -16,7 +16,25 @@
 
 喜欢本项目请点 ⭐ 收藏！
 
-<video src="https://github.com/user-attachments/assets/2f5a6f9c-18d1-4d40-9822-2de260d55dab" controls></video>
+<video width="500" src="https://github.com/user-attachments/assets/2f5a6f9c-18d1-4d40-9822-2de260d55dab" controls></video>
+
+## 最近更新 
+
+25/02/14
+
+- 支持 DeepSeek R1 等思维链模型
+- 改进了模型兼容性，改进异常处理
+
+25/02/13
+
+- 大幅缩减了网页体积
+- 支持配置搜索时使用的语言
+- 支持 Docker 部署
+- 修复“导出 PDF”不可用的问题
+
+25/02/12
+- 添加中文支持。模型会自动使用用户的语言回答了。
+- 修复一些 bug
 
 ## 使用指南
 

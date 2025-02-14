@@ -38,6 +38,14 @@
     }
 
     switch (step.type) {
+      case 'generating_query_reasoning': {
+        if (node) {
+          node.generateQueriesReasoning =
+            (node.generateQueriesReasoning ?? '') + step.delta
+        }
+        break
+      }
+
       case 'generating_query': {
         if (!node) {
           // 创建新节点
@@ -86,10 +94,17 @@
         break
       }
 
+      case 'processing_serach_result_reasoning': {
+        if (node) {
+          node.generateLearningsReasoning =
+            (node.generateLearningsReasoning ?? '') + step.delta
+        }
+        break
+      }
+
       case 'processing_serach_result': {
         if (node) {
           node.learnings = step.result.learnings || []
-          node.followUpQuestions = step.result.followUpQuestions || []
         }
         break
       }
@@ -157,6 +172,8 @@
     selectedNode.value = undefined
     searchResults.value = {}
     isLoading.value = true
+    // Clear the root node's reasoning content
+    tree.value.generateQueriesReasoning = ''
     try {
       const searchLanguage = config.value.webSearch.searchLanguage
         ? t('language', {}, { locale: config.value.webSearch.searchLanguage })
@@ -211,20 +228,28 @@
           {{ selectedNode.label ?? $t('webBrowsing.generating') }}
         </h2>
 
+        <!-- Set loading default to true, because currently don't know how to handle it otherwise -->
+        <ReasoningAccordion
+          v-model="selectedNode.generateQueriesReasoning"
+          loading
+        />
+
+        <!-- Research goal -->
+        <h3 class="text-lg font-semibold mt-2">
+          {{ t('webBrowsing.researchGoal') }}
+        </h3>
         <!-- Root node has no additional information -->
         <p v-if="selectedNode.id === '0'">
           {{ t('webBrowsing.startNode.description') }}
         </p>
         <template v-else>
-          <h3 class="text-lg font-semibold mt-2">
-            {{ t('webBrowsing.researchGoal') }}
-          </h3>
           <p
             v-if="selectedNode.researchGoal"
             class="prose max-w-none"
             v-html="marked(selectedNode.researchGoal, { gfm: true })"
           />
 
+          <!-- Visited URLs -->
           <h3 class="text-lg font-semibold mt-2">
             {{ t('webBrowsing.visitedUrls') }}
           </h3>
@@ -245,9 +270,15 @@
             </li>
           </ul>
 
+          <!-- Learnings -->
           <h3 class="text-lg font-semibold mt-2">
             {{ t('webBrowsing.learnings') }}
           </h3>
+
+          <ReasoningAccordion
+            v-model="selectedNode.generateQueriesReasoning"
+            loading
+          />
           <p
             v-for="(learning, index) in selectedNode.learnings"
             class="prose max-w-none"

@@ -15,6 +15,7 @@
   }>()
 
   const { t, locale } = useI18n()
+  const reasoningContent = ref('')
   const feedback = ref<ResearchFeedbackResult[]>([])
 
   const isLoading = ref(false)
@@ -39,17 +40,27 @@
         numQuestions,
         language: t('language', {}, { locale: locale.value }),
       })) {
-        const questions = f.questions!.filter((s) => typeof s === 'string')
-        // Incrementally update modelValue
-        for (let i = 0; i < questions.length; i += 1) {
-          if (feedback.value[i]) {
-            feedback.value[i].assistantQuestion = questions[i]
-          } else {
-            feedback.value.push({
-              assistantQuestion: questions[i],
-              userAnswer: '',
-            })
+        if (f.type === 'reasoning') {
+          reasoningContent.value += f.delta
+        } else if (f.type === 'error') {
+          error.value = f.message
+        } else if (f.type === 'object') {
+          const questions = f.value.questions!.filter(
+            (s) => typeof s === 'string',
+          )
+          // Incrementally update modelValue
+          for (let i = 0; i < questions.length; i += 1) {
+            if (feedback.value[i]) {
+              feedback.value[i].assistantQuestion = questions[i]
+            } else {
+              feedback.value.push({
+                assistantQuestion: questions[i],
+                userAnswer: '',
+              })
+            }
           }
+        } else if (f.type === 'bad-end') {
+          error.value = t('invalidStructuredOutput')
         }
       }
     } catch (e: any) {
@@ -66,6 +77,7 @@
   function clear() {
     feedback.value = []
     error.value = ''
+    reasoningContent.value = ''
   }
 
   defineExpose({
@@ -85,13 +97,16 @@
     </template>
 
     <div class="flex flex-col gap-2">
-      <div v-if="!feedback.length && !error">
+      <div v-if="!feedback.length && !reasoningContent && !error">
         {{ $t('modelFeedback.waiting') }}
       </div>
       <template v-else>
         <div v-if="error" class="text-red-500 whitespace-pre-wrap">
           {{ error }}
         </div>
+
+        <ReasoningAccordion v-model="reasoningContent" :loading="isLoading" />
+
         <div
           v-for="(feedback, index) in feedback"
           class="flex flex-col gap-2"

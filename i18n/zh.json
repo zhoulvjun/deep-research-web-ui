@@ -1,5 +1,8 @@
 {
   "language": "中文",
+  "modelThinking": "思考中...",
+  "modelThinkingComplete": "思考完毕",
+  "invalidStructuredOutput": "模型返回的内容无效或不完整，无法解析。请尝试换一个更大或者更“聪明”的模型。",
   "index": {
     "projectDescription": "Deep Research 是 {0} 的可视化 UI，可以让 AI 根据特定问题联网搜索并自行深挖，并输出研究报告。\n本项目可以流式传输 AI 的回答来实时反馈，并使用树状结构可视化搜索过程。\n全部 API 请求都在浏览器本地完成。",
     "missingConfigTitle": "需要配置 API",
@@ -45,7 +48,7 @@
     "breadth": "研究广度 (Breadth)",
     "breadthHelp": "第一次迭代中的搜索次数。后续每轮迭代的搜索次数为上一轮的一半。",
     "start": "开始研究",
-    "researching": "正在研究..."
+    "researching": "研究中..."
   },
   "modelFeedback": {
     "title": "2. 模型反馈",

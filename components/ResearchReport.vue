@@ -16,6 +16,7 @@
   const error = ref('')
   const loading = ref(false)
   const loadingExportPdf = ref(false)
+  const reasoningContent = ref('')
   const reportContent = ref('')
   const reportHtml = computed(() =>
     marked(reportContent.value, { silent: true, gfm: true, breaks: true }),
@@ -29,9 +30,20 @@
     loading.value = true
     error.value = ''
     reportContent.value = ''
+    reasoningContent.value = ''
     try {
-      for await (const chunk of writeFinalReport(params).textStream) {
-        reportContent.value += chunk
+      for await (const chunk of writeFinalReport(params).fullStream) {
+        if (chunk.type === 'reasoning') {
+          reasoningContent.value += chunk.textDelta
+        } else if (chunk.type === 'text-delta') {
+          reportContent.value += chunk.textDelta
+        } else if (chunk.type === 'error') {
+          error.value = t('researchReport.error', [
+            chunk.error instanceof Error
+              ? chunk.error.message
+              : String(chunk.error),
+          ])
+        }
       }
       reportContent.value += `\n\n## ${t(
         'researchReport.sources',
@@ -158,21 +170,25 @@
       </div>
     </template>
 
+    <div v-if="error" class="text-red-500">{{ error }}</div>
+
+    <ReasoningAccordion
+      v-if="reasoningContent"
+      v-model="reasoningContent"
+      class="mb-4"
+      :loading="loading"
+    />
+
     <div
       v-if="reportContent"
       id="report-content"
       class="prose prose-sm max-w-none p-6 bg-gray-50 dark:bg-gray-800 dark:text-white rounded-lg shadow"
       v-html="reportHtml"
     />
-    <template v-else>
-      <div v-if="error" class="text-red-500">{{ error }}</div>
-      <div v-else>
-        {{
-          loading
-            ? $t('researchReport.generating')
-            : $t('researchReport.waiting')
-        }}
-      </div>
-    </template>
+    <div v-else>
+      {{
+        loading ? $t('researchReport.generating') : $t('researchReport.waiting')
+      }}
+    </div>
   </UCard>
 </template>

@@ -6,11 +6,15 @@
 
   export type TreeNode = {
     id: string
-    /** Label, represents the search query */
+    /** Label, represents the search query. Generated from parent node. */
     label: string
+    /** The research goal of this node. Generated from parent node. */
     researchGoal?: string
+    /** Reasoning content when generating queries for the next iteration. */
+    generateQueriesReasoning?: string
+    /** Reasoning content when generating learnings for this iteration. */
+    generateLearningsReasoning?: string
     learnings?: string[]
-    followUpQuestions?: string[]
     visitedUrls?: string[]
     status?: TreeNodeStatus
     children: TreeNode[]

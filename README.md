@@ -1,15 +1,17 @@
 # Deep Research Web UI
 
+[English | [中文](README_zh.md)]
+
 This is a web UI for https://github.com/dzhng/deep-research, with several improvements and fixes.
 
 Features:
 
-- **Realtime feedback**: Stream AI responses and reflect on the UI in real-time
-- **Search visualization**: Shows the research process using a tree structure
-- **Export as PDF**: Export the final research report as a PDF
-- **Search in different languages**: Useful when you want to get search results in a different language
-- **Bring Your Own API Key**: Everything (config, API requests, ...) happens in your browser
-- **Supports more models**: Uses plain prompts instead of newer, less widely supported features like Structured Outputs. This ensures to work with more providers that haven't caught up with the latest OpenAI capabilities.
+- 🚀 **Safe & Secure**: Everything (config, API requests, ...) stays in your browser locally
+- 🕙 **Realtime feedback**: Stream AI responses and reflect on the UI in real-time
+- 🌳 **Search visualization**: Shows the research process using a tree structure
+- 📄 **Export as PDF**: Export the final research report as a PDF
+- 🌐 **Search in different languages**: Useful when you want to get search results in a different language
+- 🤖 **Supports more models**: Uses plain prompts instead of newer, less widely supported features like Structured Outputs. This ensures to work with more providers that haven't caught up with the latest OpenAI capabilities.
 
 Currently available providers:
 
@@ -54,7 +56,6 @@ docker run -p 3000:3000 --name deep-research-web -d deep-research-web
 Make sure to install dependencies:
 
 ```bash
-# pnpm
 pnpm install
 ```
 

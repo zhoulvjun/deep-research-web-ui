@@ -8,6 +8,7 @@ export type DeepPartial<T> = T extends object
   : T
 
 export function removeJsonMarkdown(text: string) {
+  text = text.trim()
   if (text.startsWith('```json')) {
     text = text.slice(7)
   } else if (text.startsWith('json')) {
@@ -18,7 +19,7 @@ export function removeJsonMarkdown(text: string) {
   if (text.endsWith('```')) {
     text = text.slice(0, -3)
   }
-  return text
+  return text.trim()
 }
 
 /**

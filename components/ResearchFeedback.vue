@@ -63,6 +63,10 @@
           error.value = t('invalidStructuredOutput')
         }
       }
+      // Check if model returned questions
+      if (!feedback.value.length) {
+        error.value = t('modelFeedback.noQuestions')
+      }
     } catch (e: any) {
       console.error('Error getting feedback:', e)
       if (e.message.includes('Failed to fetch')) {

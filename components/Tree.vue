@@ -14,6 +14,7 @@
     visitedUrls?: string[]
     status?: TreeNodeStatus
     children: TreeNode[]
+    error?: string
   }
 
   const props = defineProps<{

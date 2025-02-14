@@ -381,9 +381,20 @@ export async function deepResearch({
               }
             }
           } catch (e: any) {
-            throw new Error(
-              `Error searching for ${searchQuery.query}, depth ${currentDepth}\nMessage: ${e.message}`,
+            const id = childNodeId(nodeId, i)
+            console.error(
+              `Error in node ${id} for query ${searchQuery.query}`,
+              e,
             )
+            onProgress({
+              type: 'error',
+              message: e.message,
+              nodeId: id,
+            })
+            return {
+              learnings: [],
+              visitedUrls: [],
+            }
           }
         }),
       ),

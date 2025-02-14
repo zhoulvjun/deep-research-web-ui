@@ -8,11 +8,13 @@
   import type { TreeNode } from './Tree.vue'
   import { marked } from 'marked'
 
-  const { t, locale } = useI18n()
-  const { config } = storeToRefs(useConfigStore())
   const emit = defineEmits<{
     (e: 'complete', results: ResearchResult): void
   }>()
+
+  const toast = useToast()
+  const { t, locale } = useI18n()
+  const { config } = storeToRefs(useConfigStore())
 
   const tree = ref<TreeNode>({
     id: '0',
@@ -41,8 +43,8 @@
           // 创建新节点
           node = {
             id: nodeId,
-            label: t('webBrowsing.generating'),
-            researchGoal: t('webBrowsing.generating'),
+            label: '',
+            researchGoal: '',
             learnings: [],
             children: [],
           }
@@ -63,7 +65,7 @@
         }
         // 更新节点的查询内容
         if (step.result) {
-          node.label = step.result.query ?? t('webBrowsing.generating')
+          node.label = step.result.query ?? ''
           node.researchGoal = step.result.researchGoal
         }
         break
@@ -102,6 +104,15 @@
 
       case 'error':
         console.error(`Research error on node ${nodeId}:`, step.message)
+        node!.error = step.message
+        toast.add({
+          title: t('webBrowsing.nodeFailedToast', {
+            label: node!.label ?? nodeId,
+          }),
+          description: step.message,
+          color: 'error',
+          duration: 8000,
+        })
         break
 
       case 'complete':
@@ -186,8 +197,19 @@
         <Tree :node="tree" :selected-node="selectedNode" @select="selectNode" />
       </div>
       <div v-if="selectedNode" class="p-4">
-        <USeparator :label="t('webBrowsing.nodeDetails')" />
-        <h2 class="text-xl font-bold my-2">{{ selectedNode.label }}</h2>
+        <USeparator :label="$t('webBrowsing.nodeDetails')" />
+        <UAlert
+          v-if="selectedNode.error"
+          class="my-2"
+          :title="$t('webBrowsing.nodeFailed')"
+          :description="selectedNode.error"
+          color="error"
+          variant="soft"
+          :duration="8000"
+        />
+        <h2 class="text-xl font-bold my-2">
+          {{ selectedNode.label ?? $t('webBrowsing.generating') }}
+        </h2>
 
         <!-- Root node has no additional information -->
         <p v-if="selectedNode.id === '0'">

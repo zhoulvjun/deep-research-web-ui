@@ -29,7 +29,9 @@
       "providerHelp": "目前仅支持 Tavily，每个月可以免费搜索 1000 次。\n请在 {0} 生成一个 API 密钥。",
       "apiKey": "API 密钥",
       "queryLanguage": "使用语言",
-      "queryLanguageHelp": "修改搜索词的语言。如果你想获取不同的搜索结果（比如查询高质量的英文资料），可以在这里修改。\nAI 模型在总结的时候仍然会使用当前网页的语言。"
+      "queryLanguageHelp": "修改搜索词的语言。如果你想获取不同的搜索结果（比如查询高质量的英文资料），可以在这里修改。\nAI 模型在总结的时候仍然会使用当前网页的语言。",
+      "nodeFailed": "搜索失败",
+      "nodeFailedToast": "搜索步骤 “{label}” 失败"
     }
   },
   "researchTopic": {

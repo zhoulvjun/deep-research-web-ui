@@ -64,7 +64,9 @@
     "researchGoal": "Research Goal",
     "visitedUrls": "Visited URLs",
     "learnings": "Learnings",
-    "generating": "Generating..."
+    "generating": "Generating...",
+    "nodeFailed": "Search failed",
+    "nodeFailedToast": "Search node \"{label}\" failed"
   },
   "researchReport": {
     "title": "4. Research Report",

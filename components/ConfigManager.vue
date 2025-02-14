@@ -49,7 +49,7 @@
       )
       aiModelOptions.value = result.data.map((m) => m.id)
       // Auto-select the current model
-      if (!aiModelOptions.value.includes(config.value.ai.model)) {
+      if (config.value.ai.model && !aiModelOptions.value.includes(config.value.ai.model)) {
         aiModelOptions.value.unshift(config.value.ai.model)
       }
     } catch (error) {

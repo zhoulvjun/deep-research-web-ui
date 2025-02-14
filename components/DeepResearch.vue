@@ -245,7 +245,7 @@
         <template v-else>
           <p
             v-if="selectedNode.researchGoal"
-            class="prose max-w-none"
+            class="prose max-w-none dark:prose-invert"
             v-html="marked(selectedNode.researchGoal, { gfm: true })"
           />
 
@@ -281,7 +281,7 @@
           />
           <p
             v-for="(learning, index) in selectedNode.learnings"
-            class="prose max-w-none"
+            class="prose max-w-none dark:prose-invert"
             :key="index"
             v-html="marked(`- ${learning}`, { gfm: true })"
           />

@@ -54,7 +54,7 @@
     "waiting": "Waiting for model feedback...",
     "submit": "Submit Answer",
     "error": "Error getting feedback: {0}",
-    "noQuestions": "The AI model did not return any follow-up questions."
+    "noQuestions": "The model did not return any follow-up questions."
   },
   "webBrowsing": {
     "title": "3. Web Browsing",
@@ -75,6 +75,7 @@
   "researchReport": {
     "title": "4. Research Report",
     "exportPdf": "Export PDF",
+    "exportMarkdown": "Export Markdown",
     "sources": "Sources",
     "waiting": "Waiting for report...",
     "generating": "Generating report...",

@@ -75,6 +75,7 @@
   "researchReport": {
     "title": "4. 研究报告",
     "exportPdf": "导出 PDF",
+    "exportMarkdown": "导出 Markdown",
     "sources": "来源",
     "waiting": "等待报告...",
     "generating": "生成报告中...",

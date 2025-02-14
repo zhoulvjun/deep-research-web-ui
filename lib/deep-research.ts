@@ -172,7 +172,6 @@ function processSearchResult({
 
   return streamText({
     model: useAiModel(),
-    abortSignal: AbortSignal.timeout(60_000),
     system: systemPrompt(),
     prompt,
     onError({ error }) {

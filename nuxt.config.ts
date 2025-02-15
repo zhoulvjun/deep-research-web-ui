@@ -8,6 +8,10 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
   ],
 
+  routeRules: {
+    '/version.json': { cors: true },
+  },
+
   i18n: {
     vueI18n: './i18n.config.ts',
     strategy: 'no_prefix',

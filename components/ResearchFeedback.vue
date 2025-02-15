@@ -1,4 +1,8 @@
 <script setup lang="ts">
+  import {
+    feedbackInjectionKey,
+    formInjectionKey,
+  } from '~/constants/injection-keys'
   import { generateFeedback } from '~/lib/feedback'
 
   export interface ResearchFeedbackResult {
@@ -11,15 +15,20 @@
   }>()
 
   defineEmits<{
-    (e: 'submit', feedback: ResearchFeedbackResult[]): void
+    (e: 'submit'): void
   }>()
 
   const { t, locale } = useI18n()
-  const reasoningContent = ref('')
-  const feedback = ref<ResearchFeedbackResult[]>([])
+  const { config, showConfigManager } = storeToRefs(useConfigStore())
+  const toast = useToast()
 
+  const reasoningContent = ref('')
   const isLoading = ref(false)
   const error = ref('')
+
+  // Inject global data from index.vue
+  const form = inject(formInjectionKey)!
+  const feedback = inject(feedbackInjectionKey)!
 
   const isSubmitButtonDisabled = computed(
     () =>
@@ -31,13 +40,25 @@
       props.isLoadingSearch,
   )
 
-  async function getFeedback(query: string, numQuestions = 3) {
+  async function getFeedback() {
+    const aiConfig = config.value.ai
+    const webSearchConfig = config.value.webSearch
+
+    if (!aiConfig.model || !aiConfig.apiKey || !webSearchConfig.apiKey) {
+      toast.add({
+        title: t('index.missingConfigTitle'),
+        description: t('index.missingConfigDescription'),
+        color: 'error',
+      })
+      showConfigManager.value = true
+      return
+    }
     clear()
     isLoading.value = true
     try {
       for await (const f of generateFeedback({
-        query,
-        numQuestions,
+        query: form.value.query,
+        numQuestions: form.value.numQuestions,
         language: t('language', {}, { locale: locale.value }),
       })) {
         if (f.type === 'reasoning') {
@@ -63,6 +84,10 @@
           error.value = t('invalidStructuredOutput')
         }
       }
+      console.log(
+        `[ResearchFeedback] query: ${form.value.query}, feedback:`,
+        feedback.value,
+      )
       // Check if model returned questions
       if (!feedback.value.length) {
         error.value = t('modelFeedback.noQuestions')
@@ -125,7 +150,7 @@
         :loading="isLoadingSearch || isLoading"
         :disabled="isSubmitButtonDisabled"
         block
-        @click="$emit('submit', feedback)"
+        @click="$emit('submit')"
       >
         {{ $t('modelFeedback.submit') }}
       </UButton>

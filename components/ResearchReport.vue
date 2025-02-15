@@ -1,14 +1,12 @@
 <script setup lang="ts">
   import { marked } from 'marked'
-  import {
-    writeFinalReport,
-    type WriteFinalReportParams,
-  } from '~/lib/deep-research'
+  import { writeFinalReport } from '~/lib/deep-research'
   import jsPDF from 'jspdf'
-
-  interface CustomReportParams extends WriteFinalReportParams {
-    visitedUrls: string[]
-  }
+  import {
+    feedbackInjectionKey,
+    formInjectionKey,
+    researchResultInjectionKey,
+  } from '~/constants/injection-keys'
 
   const { t, locale } = useI18n()
   const toast = useToast()
@@ -19,6 +17,12 @@
   const loadingExportMarkdown = ref(false)
   const reasoningContent = ref('')
   const reportContent = ref('')
+
+  // Inject global data from index.vue
+  const form = inject(formInjectionKey)!
+  const feedback = inject(feedbackInjectionKey)!
+  const researchResult = inject(researchResultInjectionKey)!
+
   const reportHtml = computed(() =>
     marked(reportContent.value, { silent: true, gfm: true, breaks: true }),
   )
@@ -31,13 +35,21 @@
   )
   let pdf: jsPDF | undefined
 
-  async function generateReport(params: CustomReportParams) {
+  async function generateReport() {
     loading.value = true
     error.value = ''
     reportContent.value = ''
     reasoningContent.value = ''
     try {
-      for await (const chunk of writeFinalReport(params).fullStream) {
+      // Store a copy of the data
+      const visitedUrls = researchResult.value.visitedUrls ?? []
+      const learnings = researchResult.value.learnings ?? []
+      const { fullStream } = writeFinalReport({
+        prompt: getCombinedQuery(form.value, feedback.value),
+        language: t('language', {}, { locale: locale.value }),
+        learnings,
+      })
+      for await (const chunk of fullStream) {
         if (chunk.type === 'reasoning') {
           reasoningContent.value += chunk.textDelta
         } else if (chunk.type === 'text-delta') {
@@ -52,7 +64,7 @@
       }
       reportContent.value += `\n\n## ${t(
         'researchReport.sources',
-      )}\n\n${params.visitedUrls.map((url) => `- ${url}`).join('\n')}`
+      )}\n\n${visitedUrls.map((url) => `- ${url}`).join('\n')}`
     } catch (e: any) {
       console.error(`Generate report failed`, e)
       error.value = t('researchReport.error', [e.message])
@@ -184,36 +196,45 @@
 <template>
   <UCard>
     <template #header>
-      <div
-        class="flex flex-col sm:flex-row sm:items-center justify-between gap-2"
-      >
+      <div class="flex items-center justify-between gap-2">
         <h2 class="font-bold">{{ $t('researchReport.title') }}</h2>
-        <div class="flex gap-2">
-          <UButton
-            color="info"
-            variant="ghost"
-            icon="i-lucide-download"
-            :disabled="isExportButtonDisabled"
-            :loading="loadingExportMarkdown"
-            @click="exportToMarkdown"
-          >
-            {{ $t('researchReport.exportMarkdown') }}
-          </UButton>
-          <UButton
-            color="info"
-            variant="ghost"
-            icon="i-lucide-download"
-            :disabled="isExportButtonDisabled"
-            :loading="loadingExportPdf"
-            @click="exportToPdf"
-          >
-            {{ $t('researchReport.exportPdf') }}
-          </UButton>
-        </div>
+        <UButton
+          icon="i-lucide-refresh-cw"
+          :loading
+          variant="ghost"
+          @click="generateReport"
+        >
+          {{ $t('researchReport.regenerate') }}
+        </UButton>
       </div>
     </template>
 
     <div v-if="error" class="text-red-500">{{ error }}</div>
+
+    <div class="flex mb-4 justify-end">
+      <UButton
+        color="info"
+        variant="ghost"
+        icon="i-lucide-download"
+        size="sm"
+        :disabled="isExportButtonDisabled"
+        :loading="loadingExportMarkdown"
+        @click="exportToMarkdown"
+      >
+        {{ $t('researchReport.exportMarkdown') }}
+      </UButton>
+      <UButton
+        color="info"
+        variant="ghost"
+        icon="i-lucide-download"
+        size="sm"
+        :disabled="isExportButtonDisabled"
+        :loading="loadingExportPdf"
+        @click="exportToPdf"
+      >
+        {{ $t('researchReport.exportPdf') }}
+      </UButton>
+    </div>
 
     <ReasoningAccordion
       v-if="reasoningContent"
@@ -225,7 +246,7 @@
     <div
       v-if="reportContent"
       id="report-content"
-      class="prose prose-sm max-w-none p-6 bg-gray-50 dark:bg-gray-800 dark:prose-invert dark:text-white rounded-lg shadow"
+      class="prose prose-sm max-w-none break-words p-6 bg-gray-50 dark:bg-gray-800 dark:prose-invert dark:text-white rounded-lg shadow"
       v-html="reportHtml"
     />
     <div v-else>

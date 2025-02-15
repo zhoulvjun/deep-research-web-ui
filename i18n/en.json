@@ -81,7 +81,8 @@
     "generating": "Generating report...",
     "error": "Generate report failed: {0}",
     "downloadingFonts": "Downloading necessary fonts, this may take some time...",
-    "downloadFontFailed": "Download font failed"
+    "downloadFontFailed": "Download font failed",
+    "regenerate": "Regenerate"
   },
   "error": {
     "requestBlockedByCORS": "The current API provider may not allow cross-origin requests. Please try a different service provider or contact the provider for support."

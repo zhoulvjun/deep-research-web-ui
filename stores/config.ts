@@ -37,5 +37,7 @@ export const useConfigStore = defineStore('config', () => {
     return config.value.ai.apiBase || 'https://api.openai.com/v1'
   })
 
-  return { config: skipHydrate(config), aiApiBase }
+  const showConfigManager = ref(false)
+
+  return { config: skipHydrate(config), aiApiBase, showConfigManager }
 })

@@ -81,7 +81,8 @@
     "generating": "生成报告中...",
     "error": "生成报告失败：{0}",
     "downloadingFonts": "正在下载必要字体，可能需要较长时间...",
-    "downloadFontFailed": "下载字体失败"
+    "downloadFontFailed": "下载字体失败",
+    "regenerate": "重新生成"
   },
   "error": {
     "requestBlockedByCORS": "当前 API 服务可能不允许接口跨域，请换一个服务试试，或者向服务方反馈。"

@@ -2,14 +2,18 @@
   import {
     deepResearch,
     type PartialSearchResult,
-    type ResearchResult,
     type ResearchStep,
   } from '~/lib/deep-research'
   import type { TreeNode } from './Tree.vue'
   import { marked } from 'marked'
+  import {
+    feedbackInjectionKey,
+    formInjectionKey,
+    researchResultInjectionKey,
+  } from '~/constants/injection-keys'
 
   const emit = defineEmits<{
-    (e: 'complete', results: ResearchResult): void
+    (e: 'complete'): void
   }>()
 
   const toast = useToast()
@@ -24,6 +28,11 @@
   const selectedNode = ref<TreeNode>()
   const searchResults = ref<Record<string, PartialSearchResult>>({})
   const isLoading = ref(false)
+
+  // Inject global data from index.vue
+  const form = inject(formInjectionKey)!
+  const feedback = inject(feedbackInjectionKey)!
+  const completeResult = inject(researchResultInjectionKey)!
 
   function handleResearchProgress(step: ResearchStep) {
     let node: TreeNode | null = null
@@ -80,14 +89,17 @@
       }
 
       case 'generated_query': {
+        console.log(`[DeepResearch] node ${nodeId} generated query:`, step)
         break
       }
 
       case 'searching': {
+        console.log(`[DeepResearch] node ${nodeId} searching:`, step)
         break
       }
 
       case 'search_complete': {
+        console.log(`[DeepResearch] node ${nodeId} search complete:`, step)
         if (node) {
           node.visitedUrls = step.urls
         }
@@ -110,6 +122,10 @@
       }
 
       case 'processed_search_result': {
+        console.log(
+          `[DeepResearch] node ${nodeId} processed_search_result:`,
+          step,
+        )
         if (node) {
           node.learnings = step.result.learnings
           searchResults.value[nodeId] = step.result
@@ -118,7 +134,7 @@
       }
 
       case 'error':
-        console.error(`Research error on node ${nodeId}:`, step.message)
+        console.error(`[DeepResearch] node ${nodeId} error:`, step.message)
         node!.error = step.message
         toast.add({
           title: t('webBrowsing.nodeFailedToast', {
@@ -131,7 +147,12 @@
         break
 
       case 'complete':
-        emit('complete', step)
+        console.log(`[DeepResearch] complete:`, step)
+        completeResult.value = {
+          learnings: step.learnings,
+          visitedUrls: step.visitedUrls,
+        }
+        emit('complete')
         isLoading.value = false
         break
     }
@@ -167,7 +188,9 @@
     return parts.join('-')
   }
 
-  async function startResearch(query: string, depth: number, breadth: number) {
+  async function startResearch() {
+    if (!form.value.query || !form.value.breadth || !form.value.depth) return
+
     tree.value.children = []
     selectedNode.value = undefined
     searchResults.value = {}
@@ -179,9 +202,9 @@
         ? t('language', {}, { locale: config.value.webSearch.searchLanguage })
         : undefined
       await deepResearch({
-        query,
-        maxDepth: depth,
-        breadth,
+        query: getCombinedQuery(form.value, feedback.value),
+        maxDepth: form.value.depth,
+        breadth: form.value.breadth,
         language: t('language', {}, { locale: locale.value }),
         searchLanguage,
         onProgress: handleResearchProgress,
@@ -276,7 +299,9 @@
           </h3>
 
           <ReasoningAccordion
+            v-if="selectedNode.generateQueriesReasoning"
             v-model="selectedNode.generateQueriesReasoning"
+            class="my-2"
             loading
           />
           <p

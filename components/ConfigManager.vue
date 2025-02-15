@@ -8,10 +8,13 @@
     data: OpenAICompatibleModel[]
   }
 
-  const { config, aiApiBase } = storeToRefs(useConfigStore())
+  const {
+    config,
+    aiApiBase,
+    showConfigManager: showModal,
+  } = storeToRefs(useConfigStore())
   const { t } = useI18n()
 
-  const showModal = ref(false)
   const loadingAiModels = ref(false)
   const aiModelOptions = ref<string[]>([])
   /** If loading AI models failed, use a plain input to improve UX */

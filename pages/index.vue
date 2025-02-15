@@ -58,6 +58,11 @@
   import type { ResearchInputData } from '~/components/ResearchForm.vue'
   import type { ResearchFeedbackResult } from '~/components/ResearchFeedback.vue'
   import type { ResearchResult } from '~/lib/deep-research'
+  import {
+    feedbackInjectionKey,
+    formInjectionKey,
+    researchResultInjectionKey,
+  } from '~/constants/injection-keys'
 
   const { t, locale } = useI18n()
   const { config } = storeToRefs(useConfigStore())
@@ -70,19 +75,23 @@
   const deepResearchRef = ref<InstanceType<typeof DeepResearch>>()
   const reportRef = ref<InstanceType<typeof ResearchReport>>()
 
+  const form = ref<ResearchInputData>({
+    query: '',
+    breadth: 2,
+    depth: 2,
+    numQuestions: 3,
+  })
   const feedback = ref<ResearchFeedbackResult[]>([])
-  const researchResult = ref<ResearchResult>()
+  const researchResult = ref<ResearchResult>({
+    learnings: [],
+    visitedUrls: [],
+  })
 
-  function getCombinedQuery() {
-    return `Initial Query: ${formRef.value?.form.query}
-Follow-up Questions and Answers:
-${feedback.value
-  .map((qa) => `Q: ${qa.assistantQuestion}\nA: ${qa.userAnswer}`)
-  .join('\n')}
-    `
-  }
+  provide(formInjectionKey, form)
+  provide(feedbackInjectionKey, feedback)
+  provide(researchResultInjectionKey, researchResult)
 
-  async function generateFeedback(data: ResearchInputData) {
+  async function generateFeedback() {
     const aiConfig = config.value.ai
     const webSearchConfig = config.value.webSearch
 
@@ -95,31 +104,14 @@ ${feedback.value
       configManagerRef.value?.show()
       return
     }
-    feedbackRef.value?.getFeedback(data.query, data.numQuestions)
+    feedbackRef.value?.getFeedback()
   }
 
-  async function startDeepSearch(_feedback: ResearchFeedbackResult[]) {
-    if (
-      !formRef.value?.form.query ||
-      !formRef.value?.form.breadth ||
-      !formRef.value?.form.depth
-    )
-      return
-    feedback.value = _feedback
-    deepResearchRef.value?.startResearch(
-      getCombinedQuery(),
-      formRef.value.form.breadth,
-      formRef.value.form.depth,
-    )
+  async function startDeepSearch() {
+    deepResearchRef.value?.startResearch()
   }
 
-  async function generateReport(_researchResult: ResearchResult) {
-    researchResult.value = _researchResult
-    reportRef.value?.generateReport({
-      prompt: getCombinedQuery(),
-      learnings: researchResult.value?.learnings ?? [],
-      visitedUrls: researchResult.value?.visitedUrls ?? [],
-      language: t('language', {}, { locale: locale.value }),
-    })
+  async function generateReport() {
+    reportRef.value?.generateReport()
   }
 </script>

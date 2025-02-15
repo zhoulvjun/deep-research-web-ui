@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import { formInjectionKey } from '~/constants/injection-keys'
+
   export interface ResearchInputData {
     query: string
     breadth: number
@@ -11,29 +13,22 @@
   }>()
 
   const emit = defineEmits<{
-    (e: 'submit', value: ResearchInputData): void
+    (e: 'submit'): void
   }>()
 
-  const form = reactive({
-    query: '',
-    breadth: 2,
-    depth: 2,
-    numQuestions: 3,
-  })
+  const form = inject(formInjectionKey)!
 
   const isSubmitButtonDisabled = computed(
-    () => !form.query || !form.breadth || !form.depth || !form.numQuestions,
+    () =>
+      !form.value.query ||
+      !form.value.breadth ||
+      !form.value.depth ||
+      !form.value.numQuestions,
   )
 
   function handleSubmit() {
-    emit('submit', {
-      ...form,
-    })
+    emit('submit')
   }
-
-  defineExpose({
-    form,
-  })
 </script>
 
 <template>
@@ -102,7 +97,11 @@
         block
         @click="handleSubmit"
       >
-        {{ isLoadingFeedback ? $t('researchTopic.researching') : $t('researchTopic.start') }}
+        {{
+          isLoadingFeedback
+            ? $t('researchTopic.researching')
+            : $t('researchTopic.start')
+        }}
       </UButton>
     </template>
   </UCard>

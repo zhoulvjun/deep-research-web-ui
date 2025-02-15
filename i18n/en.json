@@ -22,8 +22,7 @@
       "providers": {
         "openaiCompatible": {
           "title": "OpenAI Compatible",
-          "description": "Currently only supports OpenAI compatible providers, e.g. Gemini, Together AI, DeepSeek, SiliconCloud, ...",
-          "apiBasePlaceholder": "https://api.openai.com/v1"
+          "description": "e.g. OpenAI, Gemini, Together AI, SiliconCloud, ...\n(Note: DeepSeek, OpenRouter and Ollama now have their own providers.)"
         }
       }
     },

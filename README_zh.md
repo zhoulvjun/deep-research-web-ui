@@ -3,6 +3,7 @@
 本项目是 https://github.com/dzhng/deep-research 的可视化版本，并做了一些改进。
 
 特色：
+
 - 🚀 **隐私安全**：所有配置和 API 请求均在浏览器端完成
 - 🕙 **实时反馈**：流式传输 AI 响应并在界面实时展示
 - 🌳 **搜索可视化**：使用树状结构展示研究过程，支持使用英文搜索词
@@ -11,14 +12,19 @@
 
 当前支持的供应商：
 
-- AI 服务：任意兼容 OpenAPI 的供应商
+- AI 服务：OpenAPI 兼容、DeepSeek、OpenRouter、Ollama
 - 网络搜索：Tavily（类似 Firecrawl，提供每月 1000 次免费搜索）
 
-喜欢本项目请点 ⭐ 收藏！
+喜欢本项目请点 ⭐ 收藏！ <video width="500" src="https://github.com/user-attachments/assets/2f5a6f9c-18d1-4d40-9822-2de260d55dab" controls></video>
 
-<video width="500" src="https://github.com/user-attachments/assets/2f5a6f9c-18d1-4d40-9822-2de260d55dab" controls></video>
+## 近期更新
 
-## 最近更新 
+25/02/15
+
+- AI 提供商支持 DeepSeek，OpenRouter 和 Ollama
+- 支持检查项目更新
+- 支持重新生成报告
+- 一般性优化和改进
 
 25/02/14
 
@@ -33,6 +39,7 @@
 - 修复“导出 PDF”不可用的问题
 
 25/02/12
+
 - 添加中文支持。模型会自动使用用户的语言回答了。
 - 修复一些 bug
 

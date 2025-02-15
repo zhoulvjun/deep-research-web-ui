@@ -21,9 +21,8 @@
       "contextSizeHelp": "上下文的最大大小（以 token 计）。这是将发送给模型的最大 token 数量。默认值为 128,000 个 token。",
       "providers": {
         "openaiCompatible": {
-          "title": "OpenAI Compatiible",
-          "description": "目前仅支持与 OpenAI 兼容的提供商，如 Gemini、Together AI、DeepSeek、SiliconCloud……",
-          "apiBasePlaceholder": "https://api.openai.com/v1"
+          "title": "OpenAI Compatible",
+          "description": "如 OpenAI、Gemini、Together AI、SiliconCloud……\n注：DeepSeek、OpenRouter 和 Ollama 现在已经有了独立选项，请切换使用。"
         }
       }
     },

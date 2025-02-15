@@ -38,7 +38,7 @@ export function generateFeedback({
     prompt,
     onError({ error }) {
       console.error(`generateFeedback`, error)
-      throw error
+      throw error instanceof Error ? error : new Error(String(error))
     },
   })
 

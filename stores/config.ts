@@ -1,7 +1,12 @@
 import { skipHydrate } from 'pinia'
 import type { Locale } from '~/components/LangSwitcher.vue'
 
-export type ConfigAiProvider = 'openai-compatible'
+export type ConfigAiProvider =
+  | 'openai-compatible'
+  | 'openrouter'
+  | 'deepseek'
+  | 'ollama'
+
 export interface ConfigAi {
   provider: ConfigAiProvider
   apiKey?: string
@@ -39,6 +44,15 @@ export const useConfigStore = defineStore('config', () => {
   )
 
   const aiApiBase = computed(() => {
+    if (config.value.ai.provider === 'openrouter') {
+      return config.value.ai.apiBase || 'https://openrouter.ai/api/v1'
+    }
+    if (config.value.ai.provider === 'deepseek') {
+      return config.value.ai.apiBase || 'https://api.deepseek.com/v1'
+    }
+    if (config.value.ai.provider === 'ollama') {
+      return config.value.ai.apiBase || 'http://localhost:11434/v1'
+    }
     return config.value.ai.apiBase || 'https://api.openai.com/v1'
   })
 

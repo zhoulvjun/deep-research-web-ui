@@ -24,10 +24,19 @@
     {
       label: t('settings.ai.providers.openaiCompatible.title'),
       help: t('settings.ai.providers.openaiCompatible.description'),
-      apiBasePlaceholder: t(
-        'settings.ai.providers.openaiCompatible.apiBasePlaceholder',
-      ),
       value: 'openai-compatible',
+    },
+    {
+      label: 'DeepSeek',
+      value: 'deepseek',
+    },
+    {
+      label: 'OpenRouter',
+      value: 'openrouter',
+    },
+    {
+      label: 'Ollama',
+      value: 'ollama',
     },
   ])
   const selectedAiProvider = computed(() =>
@@ -110,15 +119,22 @@
           <h3 class="font-bold">{{ $t('settings.ai.provider') }}</h3>
           <UFormField>
             <template v-if="selectedAiProvider" #help>
-              {{ selectedAiProvider.help }}
+              <span class="whitespace-pre-wrap">
+                {{ selectedAiProvider.help }}
+              </span>
             </template>
-            <USelect v-model="config.ai.provider" :items="aiProviderOptions" />
+            <USelect
+              v-model="config.ai.provider"
+              class="w-50"
+              :items="aiProviderOptions"
+            />
           </UFormField>
-          <div
-            v-if="config.ai.provider === 'openai-compatible'"
-            class="flex flex-col gap-y-2"
-          >
-            <UFormField :label="$t('settings.ai.apiKey')" required>
+
+          <div class="flex flex-col gap-y-2">
+            <UFormField
+              :label="$t('settings.ai.apiKey')"
+              :required="config.ai.provider !== 'ollama'"
+            >
               <PasswordInput
                 v-model="config.ai.apiKey"
                 class="w-full"
@@ -129,7 +145,7 @@
               <UInput
                 v-model="config.ai.apiBase"
                 class="w-full"
-                :placeholder="selectedAiProvider?.apiBasePlaceholder"
+                :placeholder="aiApiBase"
               />
             </UFormField>
             <UFormField :label="$t('settings.ai.model')" required>

@@ -94,7 +94,7 @@
       }
     } catch (e: any) {
       console.error('Error getting feedback:', e)
-      if (e.message.includes('Failed to fetch')) {
+      if (e.message?.includes('Failed to fetch')) {
         e.message += `\n${t('error.requestBlockedByCORS')}`
       }
       error.value = t('modelFeedback.error', [e.message])

@@ -89,7 +89,8 @@
   },
   "autoUpdate": {
     "newVersionTitle": "发现新版本：{0}",
-    "newVersionDescription": "请刷新页面以获取最新版本。",
-    "refresh": "刷新"
+    "newVersionDescription": "注：如果您使用的是自部署页面，请使用最新代码重新部署，即可获得最新功能和 bug 修复。",
+    "refresh": "刷新",
+    "dismiss": "忽略"
   }
 }

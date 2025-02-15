@@ -89,7 +89,8 @@
   },
   "autoUpdate": {
     "newVersionTitle": "New version available: {0}",
-    "newVersionDescription": "Please refresh the page to get the latest version.",
-    "refresh": "Refresh"
+    "newVersionDescription": "Note: If you are using a self-hosted version, please re-deploy to get new features and bug fixes.",
+    "refresh": "Refresh page",
+    "dismiss": "Dismiss"
   }
 }

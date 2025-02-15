@@ -7,11 +7,13 @@
   const { t } = useI18n()
   const toast = useToast()
   const runtimeConfig = useRuntimeConfig()
+  const { dismissUpdateVersion } = storeToRefs(useConfigStore())
 
   const interval = 5 * 60 * 1000
   let lastCheck: Date | undefined
 
   const checkUpdate = async () => {
+    if (import.meta.dev) return
     if (lastCheck && new Date().getTime() - lastCheck.getTime() < interval) {
       return
     }
@@ -20,7 +22,12 @@
       const response = (await $fetch(
         'https://deep-research.ataw.top/version.json',
       )) as typeof VersionMeta
-      if (semverGt(response.version, runtimeConfig.public.version)) {
+
+      const hasNewVersion = semverGt(
+        response.version,
+        runtimeConfig.public.version,
+      )
+      if (hasNewVersion && dismissUpdateVersion.value !== response.version) {
         toast.add({
           title: t('autoUpdate.newVersionTitle', [response.version]),
           description: t('autoUpdate.newVersionDescription'),
@@ -29,8 +36,17 @@
           actions: [
             {
               label: t('autoUpdate.refresh'),
+              color: 'info',
               onClick: () => {
                 window.location.reload()
+              },
+            },
+            {
+              label: t('autoUpdate.dismiss'),
+              color: 'info',
+              variant: 'subtle',
+              onClick: () => {
+                dismissUpdateVersion.value = response.version
               },
             },
           ],

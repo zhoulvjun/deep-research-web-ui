@@ -32,6 +32,11 @@ export const useConfigStore = defineStore('config', () => {
       provider: 'tavily',
     },
   })
+  // The version user dismissed the update notification
+  const dismissUpdateVersion = useLocalStorage<string>(
+    'dismiss-update-version',
+    '',
+  )
 
   const aiApiBase = computed(() => {
     return config.value.ai.apiBase || 'https://api.openai.com/v1'
@@ -39,5 +44,10 @@ export const useConfigStore = defineStore('config', () => {
 
   const showConfigManager = ref(false)
 
-  return { config: skipHydrate(config), aiApiBase, showConfigManager }
+  return {
+    config: skipHydrate(config),
+    aiApiBase,
+    showConfigManager,
+    dismissUpdateVersion: skipHydrate(dismissUpdateVersion),
+  }
 })

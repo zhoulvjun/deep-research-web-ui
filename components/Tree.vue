@@ -14,8 +14,9 @@
     generateQueriesReasoning?: string
     /** Reasoning content when generating learnings for this iteration. */
     generateLearningsReasoning?: string
+    searchResults?: WebSearchResult[]
+    /** Learnings from search results */
     learnings?: string[]
-    visitedUrls?: string[]
     status?: TreeNodeStatus
     children: TreeNode[]
     error?: string

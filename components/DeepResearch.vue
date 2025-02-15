@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import {
     deepResearch,
-    type PartialSearchResult,
+    type PartialProcessedSearchResult,
     type ResearchStep,
   } from '~/lib/deep-research'
   import type { TreeNode } from './Tree.vue'
@@ -26,7 +26,7 @@
     children: [],
   })
   const selectedNode = ref<TreeNode>()
-  const searchResults = ref<Record<string, PartialSearchResult>>({})
+  const searchResults = ref<Record<string, PartialProcessedSearchResult>>({})
   const isLoading = ref(false)
 
   // Inject global data from index.vue
@@ -101,7 +101,7 @@
       case 'search_complete': {
         console.log(`[DeepResearch] node ${nodeId} search complete:`, step)
         if (node) {
-          node.visitedUrls = step.urls
+          node.searchResults = step.results
         }
         break
       }
@@ -278,17 +278,17 @@
           </h3>
           <ul class="list-disc list-inside">
             <li
-              v-for="(url, index) in selectedNode.visitedUrls"
+              v-for="(item, index) in selectedNode.searchResults"
               class="whitespace-pre-wrap break-all"
               :key="index"
             >
               <UButton
                 class="!p-0 contents"
                 variant="link"
-                :href="url"
+                :href="item.url"
                 target="_blank"
               >
-                {{ url }}
+                {{ item.title || item.url }}
               </UButton>
             </li>
           </ul>

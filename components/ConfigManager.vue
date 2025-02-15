@@ -39,8 +39,31 @@
       value: 'ollama',
     },
   ])
+  const webSearchProviderOptions = computed(() => [
+    {
+      label: 'Tavily',
+      value: 'tavily',
+      help: 'settings.webSearch.providers.tavily.help',
+      // Only kept for easy reference in i18n Ally
+      _help: t('settings.webSearch.providers.tavily.help'),
+      link: 'https://app.tavily.com/home',
+    },
+    {
+      label: 'Firecrawl',
+      value: 'firecrawl',
+      help: 'settings.webSearch.providers.firecrawl.help',
+      // Only kept for easy reference in i18n Ally
+      _help: t('settings.webSearch.providers.firecrawl.help'),
+      link: 'https://www.firecrawl.dev/app/api-keys',
+    },
+  ])
   const selectedAiProvider = computed(() =>
     aiProviderOptions.value.find((o) => o.value === config.value.ai.provider),
+  )
+  const selectedWebSearchProvider = computed(() =>
+    webSearchProviderOptions.value.find(
+      (o) => o.value === config.value.webSearch.provider,
+    ),
   )
 
   // Try to find available AI models based on selected provider
@@ -125,7 +148,7 @@
             </template>
             <USelect
               v-model="config.ai.provider"
-              class="w-50"
+              class="w-auto"
               :items="aiProviderOptions"
             />
           </UFormField>
@@ -174,20 +197,25 @@
           <h3 class="font-bold"> {{ $t('settings.webSearch.provider') }} </h3>
           <UFormField>
             <template #help>
-              <i18n-t keypath="settings.webSearch.providerHelp" tag="p">
+              <i18n-t
+                v-if="selectedWebSearchProvider?.help"
+                :keypath="selectedWebSearchProvider.help"
+                tag="p"
+              >
                 <UButton
                   class="!p-0"
-                  to="https://app.tavily.com/home"
+                  :to="selectedWebSearchProvider.link"
                   target="_blank"
                   variant="link"
                 >
-                  app.tavily.com
+                  {{ selectedWebSearchProvider.link }}
                 </UButton>
               </i18n-t>
             </template>
             <USelect
               v-model="config.webSearch.provider"
-              :items="[{ label: 'Tavily', value: 'tavily' }]"
+              class="w-auto"
+              :items="webSearchProviderOptions"
             />
           </UFormField>
           <UFormField :label="$t('settings.webSearch.apiKey')" required>

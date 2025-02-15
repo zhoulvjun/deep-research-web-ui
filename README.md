@@ -16,7 +16,7 @@ Features:
 Currently available providers:
 
 - AI: OpenAI compatible, DeepSeek, OpenRouter, Ollama
-- Web Search: Tavily (similar to Firecrawl, but with more free quota (1000 credits / month))
+- Web Search: Tavily (1000 free credits / month), Firecrawl
 
 Please give a 🌟 Star if you like this project!
 
@@ -26,7 +26,7 @@ Please give a 🌟 Star if you like this project!
 
 25/02/15
 
-- Added provider support for DeepSeek, OpenRouter and Ollama
+- Added AI providers DeepSeek, OpenRouter and Ollama; Added web search provider Firecrawl
 - Supported checking project updates
 - Supported regenerating reports
 - General fixes

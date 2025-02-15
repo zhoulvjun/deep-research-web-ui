@@ -12,8 +12,7 @@
 
 当前支持的供应商：
 
-- AI 服务：OpenAPI 兼容、DeepSeek、OpenRouter、Ollama
-- 网络搜索：Tavily（类似 Firecrawl，提供每月 1000 次免费搜索）
+- AI 服务：OpenAPI 每月 1000 次免费搜索）、Firecrawl
 
 喜欢本项目请点 ⭐ 收藏！ <video width="500" src="https://github.com/user-attachments/assets/2f5a6f9c-18d1-4d40-9822-2de260d55dab" controls></video>
 
@@ -21,7 +20,7 @@
 
 25/02/15
 
-- AI 提供商支持 DeepSeek，OpenRouter 和 Ollama
+- AI 提供商支持 DeepSeek，OpenRouter 和 Ollama，联网搜素支持 Firecrawl
 - 支持检查项目更新
 - 支持重新生成报告
 - 一般性优化和改进

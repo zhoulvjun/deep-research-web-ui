@@ -17,6 +17,7 @@
     "@ai-sdk/ui-utils": "^1.1.14",
     "@ai-sdk/vue": "^1.1.17",
     "@iconify-json/lucide": "^1.2.26",
+    "@mendable/firecrawl-js": "^1.17.0",
     "@nuxt/ui": "3.0.0-alpha.12",
     "@nuxtjs/color-mode": "^3.5.2",
     "@nuxtjs/i18n": "9.2.0",

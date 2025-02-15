@@ -7,6 +7,8 @@ export type ConfigAiProvider =
   | 'deepseek'
   | 'ollama'
 
+export type ConfigWebSearchProvider = 'tavily' | 'firecrawl'
+
 export interface ConfigAi {
   provider: ConfigAiProvider
   apiKey?: string
@@ -15,7 +17,7 @@ export interface ConfigAi {
   contextSize?: number
 }
 export interface ConfigWebSearch {
-  provider: 'tavily'
+  provider: ConfigWebSearchProvider
   apiKey?: string
   /** Force the LLM to generate serp queries in a certain language */
   searchLanguage?: Locale

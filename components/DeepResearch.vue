@@ -205,7 +205,7 @@
         query: getCombinedQuery(form.value, feedback.value),
         maxDepth: form.value.depth,
         breadth: form.value.breadth,
-        language: t('language', {}, { locale: locale.value }),
+        languageCode: locale.value,
         searchLanguage,
         onProgress: handleResearchProgress,
       })

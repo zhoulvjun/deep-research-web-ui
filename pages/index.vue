@@ -3,7 +3,12 @@
     <UContainer>
       <div class="max-w-4xl mx-auto py-8 flex flex-col gap-y-4">
         <div class="flex flex-col sm:flex-row gap-2">
-          <h1 class="text-3xl font-bold text-center mb-2"> Deep Research </h1>
+          <h1 class="text-3xl font-bold text-center mb-2">
+            Deep Research
+            <span class="text-xs text-gray-400 dark:text-gray-500">
+              v{{ version }}
+            </span>
+          </h1>
           <div class="mx-auto sm:ml-auto sm:mr-0 flex items-center gap-2">
             <GitHubButton />
             <ConfigManager ref="configManagerRef" />
@@ -57,6 +62,7 @@
   const { t, locale } = useI18n()
   const { config } = storeToRefs(useConfigStore())
   const toast = useToast()
+  const version = useRuntimeConfig().public.version
 
   const configManagerRef = ref<InstanceType<typeof ConfigManager>>()
   const formRef = ref<InstanceType<typeof ResearchForm>>()

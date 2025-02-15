@@ -85,5 +85,10 @@
   },
   "error": {
     "requestBlockedByCORS": "当前 API 服务可能不允许接口跨域，请换一个服务试试，或者向服务方反馈。"
+  },
+  "autoUpdate": {
+    "newVersionTitle": "发现新版本：{0}",
+    "newVersionDescription": "请刷新页面以获取最新版本。",
+    "refresh": "刷新"
   }
 }

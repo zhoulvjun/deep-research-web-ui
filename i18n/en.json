@@ -85,5 +85,10 @@
   },
   "error": {
     "requestBlockedByCORS": "The current API provider may not allow cross-origin requests. Please try a different service provider or contact the provider for support."
+  },
+  "autoUpdate": {
+    "newVersionTitle": "New version available: {0}",
+    "newVersionDescription": "Please refresh the page to get the latest version.",
+    "refresh": "Refresh"
   }
 }

@@ -1,3 +1,5 @@
+import { version as projVersion } from './public/version.json'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
@@ -8,8 +10,16 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
   ],
 
+  runtimeConfig: {
+    public: {
+      version: projVersion,
+    },
+  },
+
   routeRules: {
-    '/version.json': { cors: true },
+    '/version.json': {
+      cors: true,
+    },
   },
 
   i18n: {

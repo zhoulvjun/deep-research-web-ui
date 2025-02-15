@@ -14,6 +14,8 @@
   const showModal = ref(false)
   const loadingAiModels = ref(false)
   const aiModelOptions = ref<string[]>([])
+  /** If loading AI models failed, use a plain input to improve UX */
+  const isLoadAiModelsFailed = ref(false)
 
   const aiProviderOptions = computed(() => [
     {
@@ -48,19 +50,24 @@
         `Found ${result.data.length} AI models for provider ${config.value.ai.provider}`,
       )
       aiModelOptions.value = result.data.map((m) => m.id)
-      // Auto-select the current model
-      if (config.value.ai.model && !aiModelOptions.value.includes(config.value.ai.model)) {
-        aiModelOptions.value.unshift(config.value.ai.model)
+      isLoadAiModelsFailed.value = false
+
+      if (aiModelOptions.value.length) {
+        // Auto-select the current model
+        if (
+          config.value.ai.model &&
+          !aiModelOptions.value.includes(config.value.ai.model)
+        ) {
+          aiModelOptions.value.unshift(config.value.ai.model)
+        }
       }
     } catch (error) {
       console.error(`Fetch AI models failed`, error)
-      if (config.value.ai.model) {
-        aiModelOptions.value = [config.value.ai.model]
-      } else {
-        aiModelOptions.value = []
-      }
+      isLoadAiModelsFailed.value = true
+      aiModelOptions.value = []
+    } finally {
+      loadingAiModels.value = false
     }
-    loadingAiModels.value = false
   }, 1000)
 
   function createAndSelectAiModel(model: string) {
@@ -124,6 +131,7 @@
             </UFormField>
             <UFormField :label="$t('settings.ai.model')" required>
               <UInputMenu
+                v-if="aiModelOptions.length && !isLoadAiModelsFailed"
                 v-model="config.ai.model"
                 class="w-full"
                 :items="aiModelOptions"
@@ -131,6 +139,12 @@
                 :loading="loadingAiModels"
                 create-item
                 @create="createAndSelectAiModel"
+              />
+              <UInput
+                v-else
+                v-model="config.ai.model"
+                class="w-full"
+                :placeholder="$t('settings.ai.model')"
               />
             </UFormField>
           </div>

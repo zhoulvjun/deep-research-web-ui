@@ -14,9 +14,14 @@
 
 - AI 服务：OpenAPI 每月 1000 次免费搜索）、Firecrawl
 
-喜欢本项目请点 ⭐ 收藏！ <video width="500" src="https://github.com/user-attachments/assets/2f5a6f9c-18d1-4d40-9822-2de260d55dab" controls></video>
+喜欢本项目请点 ⭐ 收藏！ <video width="500" src="https://github.com/user-attachments/assets/8f9baa43-a74e-4613-aebb-1bcc29a686f0" controls></video>
 
 ## 近期更新
+
+25/02/16
+
+- 使用 VueFlow 重构了搜索可视化功能
+- 一些样式和 bug 修复
 
 25/02/15
 
@@ -36,11 +41,6 @@
 - 支持配置搜索时使用的语言
 - 支持 Docker 部署
 - 修复“导出 PDF”不可用的问题
-
-25/02/12
-
-- 添加中文支持。模型会自动使用用户的语言回答了。
-- 修复一些 bug
 
 ## 使用指南
 

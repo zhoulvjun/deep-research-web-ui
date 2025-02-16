@@ -27,7 +27,12 @@ export type ProcessedSearchResult = z.infer<typeof searchResultTypeSchema>
 export type PartialProcessedSearchResult = DeepPartial<ProcessedSearchResult>
 
 export type ResearchStep =
-  | { type: 'generating_query'; result: PartialSearchQuery; nodeId: string }
+  | {
+      type: 'generating_query'
+      result: PartialSearchQuery
+      nodeId: string
+      parentNodeId?: string
+    }
   | { type: 'generating_query_reasoning'; delta: string; nodeId: string }
   | {
       type: 'generated_query'
@@ -49,9 +54,8 @@ export type ResearchStep =
       nodeId: string
     }
   | {
-      type: 'processed_search_result'
-      query: string
-      result: ProcessedSearchResult
+      type: 'node_complete'
+      result?: ProcessedSearchResult
       nodeId: string
     }
   | { type: 'error'; message: string; nodeId: string }
@@ -239,6 +243,12 @@ export async function deepResearch({
   const { t } = useNuxtApp().$i18n
   const language = t('language', {}, { locale: languageCode })
 
+  onProgress({
+    type: 'generating_query',
+    nodeId,
+    result: {},
+  })
+
   try {
     const searchQueriesResult = generateSearchQueries({
       query,
@@ -268,9 +278,11 @@ export async function deepResearch({
             type: 'generating_query',
             result: searchQueries[i],
             nodeId: childNodeId(nodeId, i),
+            parentNodeId: nodeId,
           })
         }
       } else if (chunk.type === 'reasoning') {
+        // Reasoning part goes to the parent node
         onProgress({
           type: 'generating_query_reasoning',
           delta: chunk.delta,
@@ -292,6 +304,11 @@ export async function deepResearch({
         break
       }
     }
+
+    onProgress({
+      type: 'node_complete',
+      nodeId,
+    })
 
     for (let i = 0; i < searchQueries.length; i++) {
       onProgress({
@@ -318,13 +335,13 @@ export async function deepResearch({
             nodeId: childNodeId(nodeId, i),
           })
           try {
-            // Use Tavily to search the web
+            // search the web
             const results = await useWebSearch()(searchQuery.query, {
               maxResults: 5,
               lang: languageCode,
             })
             console.log(
-              `Ran ${searchQuery.query}, found ${results.length} contents`,
+              `[DeepResearch] Searched "${searchQuery.query}", found ${results.length} contents`,
             )
 
             // Collect URLs from this search
@@ -393,12 +410,11 @@ export async function deepResearch({
             const nextDepth = currentDepth + 1
 
             onProgress({
-              type: 'processed_search_result',
+              type: 'node_complete',
               result: {
                 learnings: allLearnings,
                 followUpQuestions: searchResult.followUpQuestions ?? [],
               },
-              query: searchQuery.query,
               nodeId: childNodeId(nodeId, i),
             })
 

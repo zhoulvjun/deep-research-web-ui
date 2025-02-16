@@ -52,7 +52,7 @@
 <script setup lang="ts">
   import type ResearchForm from '~/components/ResearchForm.vue'
   import type ResearchFeedback from '~/components/ResearchFeedback.vue'
-  import type DeepResearch from '~/components/DeepResearch.vue'
+  import type DeepResearch from '~/components/DeepResearch/DeepResearch.vue'
   import type ResearchReport from '~/components/ResearchReport.vue'
   import type ConfigManager from '~/components/ConfigManager.vue'
   import type { ResearchInputData } from '~/components/ResearchForm.vue'
@@ -64,7 +64,7 @@
     researchResultInjectionKey,
   } from '~/constants/injection-keys'
 
-  const { t, locale } = useI18n()
+  const { t } = useI18n()
   const { config } = storeToRefs(useConfigStore())
   const toast = useToast()
   const version = useRuntimeConfig().public.version

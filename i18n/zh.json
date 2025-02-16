@@ -76,7 +76,8 @@
     "learnings": "结论",
     "generating": "生成中...",
     "nodeFailed": "搜索失败",
-    "nodeFailedToast": "搜索步骤 “{label}” 失败"
+    "nodeFailedToast": "搜索步骤 “{label}” 失败",
+    "followUpQuestions": "后续问题"
   },
   "researchReport": {
     "title": "4. 研究报告",

@@ -76,7 +76,8 @@
     "learnings": "Learnings",
     "generating": "Generating...",
     "nodeFailed": "Search failed",
-    "nodeFailedToast": "Search node \"{label}\" failed"
+    "nodeFailedToast": "Search node \"{label}\" failed",
+    "followUpQuestions": "Follow-up Questions"
   },
   "researchReport": {
     "title": "4. Research Report",

@@ -4,13 +4,33 @@
     type PartialProcessedSearchResult,
     type ResearchStep,
   } from '~/lib/deep-research'
-  import type { TreeNode } from './Tree.vue'
   import { marked } from 'marked'
   import {
     feedbackInjectionKey,
     formInjectionKey,
     researchResultInjectionKey,
   } from '~/constants/injection-keys'
+  import Flow from './SearchFlow.vue'
+  import SearchFlow from './SearchFlow.vue'
+
+  export type DeepResearchNodeStatus = Exclude<ResearchStep['type'], 'complete'>
+
+  export type DeepResearchNode = {
+    id: string
+    /** Label, represents the search query. Generated from parent node. */
+    label: string
+    /** The research goal of this node. Generated from parent node. */
+    researchGoal?: string
+    /** Reasoning content when generating queries for the next iteration. */
+    generateQueriesReasoning?: string
+    /** Reasoning content when generating learnings for this iteration. */
+    generateLearningsReasoning?: string
+    searchResults?: WebSearchResult[]
+    /** Learnings from search results */
+    learnings?: string[]
+    status?: DeepResearchNodeStatus
+    error?: string
+  }
 
   const emit = defineEmits<{
     (e: 'complete'): void
@@ -20,14 +40,20 @@
   const { t, locale } = useI18n()
   const { config } = storeToRefs(useConfigStore())
 
-  const tree = ref<TreeNode>({
-    id: '0',
-    label: t('webBrowsing.startNode.label'),
-    children: [],
-  })
-  const selectedNode = ref<TreeNode>()
+  const flowRef = ref<InstanceType<typeof Flow>>()
+  const rootNode: DeepResearchNode = { id: '0', label: 'Start' }
+  // The complete search data.
+  // There's another tree stored in SearchNode.vue, with only basic data (id, status, ...)
+  const nodes = ref<DeepResearchNode[]>([{ ...rootNode }])
+  const selectedNodeId = ref<string>()
   const searchResults = ref<Record<string, PartialProcessedSearchResult>>({})
   const isLoading = ref(false)
+
+  const selectedNode = computed(() => {
+    if (selectedNodeId.value) {
+      return nodes.value.find((n) => n.id === selectedNodeId.value)
+    }
+  })
 
   // Inject global data from index.vue
   const form = inject(formInjectionKey)!
@@ -35,14 +61,22 @@
   const completeResult = inject(researchResultInjectionKey)!
 
   function handleResearchProgress(step: ResearchStep) {
-    let node: TreeNode | null = null
+    let node: DeepResearchNode | undefined
     let nodeId = ''
 
     if (step.type !== 'complete') {
       nodeId = step.nodeId
-      node = findNode(tree.value, step.nodeId)
-      if (node) {
+      node = nodes.value.find((n) => n.id === nodeId)
+      if (node && node.status !== step.type) {
+        // FIXME: currently `node_complete` is always triggered last,
+        // so error is possibly overridden
+        if (node.status === 'error') {
+          return
+        }
         node.status = step.type
+        flowRef.value?.updateNode(nodeId, {
+          status: step.type,
+        })
       }
     }
 
@@ -57,31 +91,31 @@
 
       case 'generating_query': {
         if (!node) {
-          // 创建新节点
           node = {
             id: nodeId,
-            label: '',
+            label: step.result.query ?? '',
             researchGoal: '',
             learnings: [],
-            children: [],
           }
-          const parentNodeId = getParentNodeId(nodeId)
-          // 如果是根节点的直接子节点
-          if (parentNodeId === '0') {
-            tree.value.children.push(node)
-          } else {
-            // 找到父节点并添加
-            const parentNode = findNode(
-              tree.value,
-              getParentNodeId(step.nodeId),
-            )
-            if (parentNode) {
-              parentNode.children.push(node)
-            }
+          const parentNodeId = step.parentNodeId
+          nodes.value.push(node)
+          flowRef.value?.addNode(
+            nodeId,
+            {
+              title: node.label,
+              status: node.status,
+            },
+            parentNodeId,
+          )
+        } else {
+          if (node.label !== step.result.query) {
+            flowRef.value?.updateNode(nodeId, {
+              title: step.result.query ?? '',
+            })
           }
         }
-        // 更新节点的查询内容
-        if (step.result) {
+        // Update the node
+        if (!isRootNode(node)) {
           node.label = step.result.query ?? ''
           node.researchGoal = step.result.researchGoal
         }
@@ -121,12 +155,12 @@
         break
       }
 
-      case 'processed_search_result': {
+      case 'node_complete': {
         console.log(
           `[DeepResearch] node ${nodeId} processed_search_result:`,
           step,
         )
-        if (node) {
+        if (node && step.result) {
           node.learnings = step.result.learnings
           searchResults.value[nodeId] = step.result
         }
@@ -134,7 +168,11 @@
       }
 
       case 'error':
-        console.error(`[DeepResearch] node ${nodeId} error:`, step.message)
+        console.error(
+          `[DeepResearch] node ${nodeId} error:`,
+          node,
+          step.message,
+        )
         node!.error = step.message
         toast.add({
           title: t('webBrowsing.nodeFailedToast', {
@@ -158,45 +196,30 @@
     }
   }
 
-  // 辅助函数：根据节点ID查找节点
-  function findNode(root: TreeNode, targetId: string): TreeNode | null {
-    if (!targetId) return null
-    if (root.id === targetId) {
-      return root
-    }
-    for (const child of root.children) {
-      const found = findNode(child, targetId)
-      if (found) {
-        return found
-      }
-    }
-    return null
+  function isRootNode(node: DeepResearchNode) {
+    return node.id === '0'
   }
 
-  function selectNode(node: TreeNode) {
-    if (selectedNode.value?.id === node.id) {
-      selectedNode.value = undefined
+  function selectNode(nodeId: string) {
+    if (selectedNodeId.value === nodeId) {
+      selectedNodeId.value = undefined
     } else {
-      selectedNode.value = node
+      selectedNodeId.value = nodeId
     }
-  }
-
-  // 辅助函数：获取节点的父节点 ID
-  function getParentNodeId(nodeId: string): string {
-    const parts = nodeId.split('-')
-    parts.pop()
-    return parts.join('-')
   }
 
   async function startResearch() {
     if (!form.value.query || !form.value.breadth || !form.value.depth) return
 
-    tree.value.children = []
-    selectedNode.value = undefined
+    nodes.value = [{ ...rootNode }]
+    selectedNodeId.value = undefined
     searchResults.value = {}
     isLoading.value = true
-    // Clear the root node's reasoning content
-    tree.value.generateQueriesReasoning = ''
+    flowRef.value?.clearNodes()
+
+    // Wait after the flow is cleared
+    await new Promise((r) => requestAnimationFrame(r))
+
     try {
       const searchLanguage = config.value.webSearch.searchLanguage
         ? t('language', {}, { locale: config.value.webSearch.searchLanguage })
@@ -234,7 +257,11 @@
     </template>
     <div class="flex flex-col">
       <div class="overflow-y-auto">
-        <Tree :node="tree" :selected-node="selectedNode" @select="selectNode" />
+        <SearchFlow
+          ref="flowRef"
+          :selected-node-id="selectedNodeId"
+          @node-click="selectNode"
+        />
       </div>
       <div v-if="selectedNode" class="p-4">
         <USeparator :label="$t('webBrowsing.nodeDetails')" />
@@ -251,64 +278,82 @@
           {{ selectedNode.label ?? $t('webBrowsing.generating') }}
         </h2>
 
-        <!-- Set loading default to true, because currently don't know how to handle it otherwise -->
-        <ReasoningAccordion
-          v-model="selectedNode.generateQueriesReasoning"
-          loading
-        />
-
         <!-- Research goal -->
         <h3 class="text-lg font-semibold mt-2">
           {{ t('webBrowsing.researchGoal') }}
         </h3>
         <!-- Root node has no additional information -->
-        <p v-if="selectedNode.id === '0'">
+        <p v-if="isRootNode(selectedNode)">
           {{ t('webBrowsing.startNode.description') }}
         </p>
-        <template v-else>
-          <p
-            v-if="selectedNode.researchGoal"
-            class="prose max-w-none dark:prose-invert"
-            v-html="marked(selectedNode.researchGoal, { gfm: true })"
-          />
+        <p
+          v-if="selectedNode.researchGoal"
+          class="prose max-w-none dark:prose-invert"
+          v-html="marked(selectedNode.researchGoal, { gfm: true })"
+        />
 
-          <!-- Visited URLs -->
-          <h3 class="text-lg font-semibold mt-2">
-            {{ t('webBrowsing.visitedUrls') }}
-          </h3>
-          <ul class="list-disc list-inside">
-            <li
-              v-for="(item, index) in selectedNode.searchResults"
-              class="whitespace-pre-wrap break-all"
-              :key="index"
+        <!-- Visited URLs -->
+        <h3 class="text-lg font-semibold mt-2">
+          {{ t('webBrowsing.visitedUrls') }}
+        </h3>
+        <ul
+          v-if="selectedNode.searchResults?.length"
+          class="list-disc list-inside"
+        >
+          <li
+            v-for="(item, index) in selectedNode.searchResults"
+            class="whitespace-pre-wrap break-all"
+            :key="index"
+          >
+            <UButton
+              class="!p-0 contents"
+              variant="link"
+              :href="item.url"
+              target="_blank"
             >
-              <UButton
-                class="!p-0 contents"
-                variant="link"
-                :href="item.url"
-                target="_blank"
-              >
-                {{ item.title || item.url }}
-              </UButton>
-            </li>
-          </ul>
+              {{ item.title || item.url }}
+            </UButton>
+          </li>
+        </ul>
+        <span v-else> - </span>
 
-          <!-- Learnings -->
-          <h3 class="text-lg font-semibold mt-2">
-            {{ t('webBrowsing.learnings') }}
+        <!-- Learnings -->
+        <h3 class="text-lg font-semibold mt-2">
+          {{ t('webBrowsing.learnings') }}
+        </h3>
+
+        <ReasoningAccordion
+          v-if="selectedNode.generateLearningsReasoning"
+          v-model="selectedNode.generateLearningsReasoning"
+          class="my-2"
+          :loading="
+            selectedNode.status === 'processing_serach_result_reasoning' ||
+            selectedNode.status === 'processing_serach_result'
+          "
+        />
+        <p
+          v-for="(learning, index) in selectedNode.learnings"
+          class="prose max-w-none dark:prose-invert"
+          :key="index"
+          v-html="marked(`- ${learning}`, { gfm: true })"
+        />
+        <span v-if="!selectedNode.learnings?.length"> - </span>
+
+        <!-- Follow up questions -->
+        <!-- Only show if there is reasoning content. Otherwise the follow-ups are basically just child nodes. -->
+        <template v-if="selectedNode.generateQueriesReasoning">
+          <h3 class="text-lg font-semibold my-2">
+            {{ t('webBrowsing.followUpQuestions') }}
           </h3>
 
+          <!-- Set loading default to true, because currently don't know how to handle it otherwise -->
           <ReasoningAccordion
             v-if="selectedNode.generateQueriesReasoning"
             v-model="selectedNode.generateQueriesReasoning"
-            class="my-2"
-            loading
-          />
-          <p
-            v-for="(learning, index) in selectedNode.learnings"
-            class="prose max-w-none dark:prose-invert"
-            :key="index"
-            v-html="marked(`- ${learning}`, { gfm: true })"
+            :loading="
+              selectedNode.status === 'generating_query_reasoning' ||
+              selectedNode.status === 'generating_query'
+            "
           />
         </template>
       </div>

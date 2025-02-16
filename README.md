@@ -20,9 +20,14 @@ Currently available providers:
 
 Please give a 🌟 Star if you like this project!
 
-<video width="500" src="https://github.com/user-attachments/assets/2f5a6f9c-18d1-4d40-9822-2de260d55dab" controls></video>
+<video width="500" src="https://github.com/user-attachments/assets/8f9baa43-a74e-4613-aebb-1bcc29a686f0" controls></video>
 
 ## Recent updates
+
+25/02/16
+
+- Refactored the search visualization using VueFlow
+- Style & bug fixes
 
 25/02/15
 
@@ -43,10 +48,6 @@ Please give a 🌟 Star if you like this project!
 - Added Docker support
 - Fixed "export as PDF" issues
 
-25/02/12
-
-- Added Chinese translation. The models will respond in the user's language.
-- Various fixes
 
 ## How to use
 

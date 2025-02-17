@@ -27,6 +27,7 @@ Please give a 🌟 Star if you like this project!
 25/02/17
 
 - Added: set rate limits for web search
+- Added: set context length for AI model
 
 25/02/16
 

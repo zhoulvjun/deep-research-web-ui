@@ -17,8 +17,8 @@
       "apiKey": "API 密钥",
       "apiBase": "API Base URL",
       "model": "模型名称",
-      "contextSize": "上下文大小",
-      "contextSizeHelp": "上下文的最大大小（以 token 计）。这是将发送给模型的最大 token 数量。默认值为 128,000 个 token。",
+      "contextSize": "上下文长度",
+      "contextSizeHelp": "发送给模型的最大 token 数量，不能超过模型本身支持的上下文长度。",
       "providers": {
         "openaiCompatible": {
           "title": "OpenAI Compatible",

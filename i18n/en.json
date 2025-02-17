@@ -17,8 +17,8 @@
       "apiKey": "API Key",
       "apiBase": "API Base URL",
       "model": "Model",
-      "contextSize": "Context Size",
-      "contextSizeHelp": "The maximum size of the context in tokens. This is the maximum number of tokens that will be sent to the model. The default is 128,000 tokens.",
+      "contextSize": "Context Length",
+      "contextSizeHelp": "The maximum number of tokens that will be sent to the model. Can't be bigger than the model's context length.",
       "providers": {
         "openaiCompatible": {
           "title": "OpenAI Compatible",

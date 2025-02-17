@@ -103,7 +103,7 @@
     } finally {
       loadingAiModels.value = false
     }
-  }, 1000)
+  }, 500)
 
   function createAndSelectAiModel(model: string) {
     aiModelOptions.value.push(model)
@@ -189,6 +189,19 @@
                 :placeholder="$t('settings.ai.model')"
               />
             </UFormField>
+            <UFormField :label="$t('settings.ai.contextSize')">
+              <template #help>
+                {{ $t('settings.ai.contextSizeHelp') }}
+              </template>
+              <UInput
+                v-model="config.ai.contextSize"
+                class="w-26"
+                type="number"
+                placeholder="128000"
+                :min="512"
+              />
+              tokens
+            </UFormField>
           </div>
 
           <USeparator class="my-2" />
@@ -247,6 +260,7 @@
               v-model="config.webSearch.concurrencyLimit"
               class="w-15"
               type="number"
+              placeholder="2"
               :min="1"
               :max="5"
               :step="1"

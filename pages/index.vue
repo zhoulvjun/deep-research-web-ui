@@ -46,6 +46,7 @@
         <ResearchReport ref="reportRef" />
       </div>
     </UContainer>
+    <AutoUpdateToast />
   </div>
 </template>
 

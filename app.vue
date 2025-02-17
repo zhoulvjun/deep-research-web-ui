@@ -3,7 +3,6 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-    <AutoUpdateToast />
   </UApp>
 </template>
 

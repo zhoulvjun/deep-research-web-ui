@@ -38,7 +38,9 @@
         "firecrawl": {
           "help": "Get one API key at {0}."
         }
-      }
+      },
+      "concurrencyLimitHelp": "Limit the concurrent search tasks. This is useful to avoid overloading the search provider and causing requests to fail.",
+      "concurrencyLimit": "Concurrency Limit"
     }
   },
   "researchTopic": {

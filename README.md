@@ -24,6 +24,10 @@ Please give a 🌟 Star if you like this project!
 
 ## Recent updates
 
+25/02/17
+
+- Added: set rate limits for web search
+
 25/02/16
 
 - Refactored the search visualization using VueFlow
@@ -47,7 +51,6 @@ Please give a 🌟 Star if you like this project!
 - Supported searching in different languages
 - Added Docker support
 - Fixed "export as PDF" issues
-
 
 ## How to use
 

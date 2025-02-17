@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { computed, defineProps } from 'vue'
   import { Handle, Position } from '@vue-flow/core'
   import type { ButtonProps } from '@nuxt/ui'
   import type { SearchNodeData } from './SearchFlow.vue'

@@ -61,9 +61,6 @@ export type ResearchStep =
   | { type: 'error'; message: string; nodeId: string }
   | { type: 'complete'; learnings: string[]; visitedUrls: string[] }
 
-// increase this if you have higher API rate limits
-const ConcurrencyLimit = 2
-
 /**
  * Schema for {@link generateSearchQueries} without dynamic descriptions
  */
@@ -242,6 +239,7 @@ export async function deepResearch({
 }): Promise<ResearchResult> {
   const { t } = useNuxtApp().$i18n
   const language = t('language', {}, { locale: languageCode })
+  const globalLimit = usePLimit()
 
   onProgress({
     type: 'generating_query',
@@ -257,7 +255,6 @@ export async function deepResearch({
       language,
       searchLanguage,
     })
-    const limit = pLimit(ConcurrencyLimit)
 
     let searchQueries: PartialSearchQuery[] = []
 
@@ -322,7 +319,7 @@ export async function deepResearch({
     // Run in parallel and limit the concurrency
     const results = await Promise.all(
       searchQueries.map((searchQuery, i) =>
-        limit(async () => {
+        globalLimit(async () => {
           if (!searchQuery?.query) {
             return {
               learnings: [],
@@ -433,17 +430,26 @@ export async function deepResearch({
                 .join('')}
             `.trim()
 
-              return deepResearch({
-                query: nextQuery,
-                breadth: nextBreadth,
-                maxDepth,
-                learnings: allLearnings,
-                visitedUrls: allUrls,
-                onProgress,
-                currentDepth: nextDepth,
-                nodeId: childNodeId(nodeId, i),
-                languageCode,
-              })
+              // Add concurrency by 1, and do next recursive search
+              globalLimit.concurrency++
+              try {
+                const r = await deepResearch({
+                  query: nextQuery,
+                  breadth: nextBreadth,
+                  maxDepth,
+                  learnings: allLearnings,
+                  visitedUrls: allUrls,
+                  onProgress,
+                  currentDepth: nextDepth,
+                  nodeId: childNodeId(nodeId, i),
+                  languageCode,
+                })
+                return r
+              } catch (error) {
+                throw error
+              } finally {
+                globalLimit.concurrency--
+              }
             } else {
               return {
                 learnings: allLearnings,

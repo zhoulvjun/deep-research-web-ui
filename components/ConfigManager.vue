@@ -239,6 +239,19 @@
               private
             />
           </UFormField>
+          <UFormField :label="$t('settings.webSearch.concurrencyLimit')">
+            <template #help>
+              {{ $t('settings.webSearch.concurrencyLimitHelp') }}
+            </template>
+            <UInput
+              v-model="config.webSearch.concurrencyLimit"
+              class="w-15"
+              type="number"
+              :min="1"
+              :max="5"
+              :step="1"
+            />
+          </UFormField>
         </div>
       </template>
       <template #footer>

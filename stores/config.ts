@@ -21,6 +21,8 @@ export interface ConfigWebSearch {
   apiKey?: string
   /** Force the LLM to generate serp queries in a certain language */
   searchLanguage?: Locale
+  /** Limit the number of concurrent tasks globally */
+  concurrencyLimit?: number
 }
 
 export interface Config {
@@ -37,8 +39,9 @@ export const useConfigStore = defineStore('config', () => {
     },
     webSearch: {
       provider: 'tavily',
+      concurrencyLimit: 2,
     },
-  })
+  } satisfies Config)
   // The version user dismissed the update notification
   const dismissUpdateVersion = useLocalStorage<string>(
     'dismiss-update-version',

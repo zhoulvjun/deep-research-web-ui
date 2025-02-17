@@ -25,7 +25,7 @@
 
 25/02/15
 
-- AI 提供商支持 DeepSeek，OpenRouter 和 Ollama，联网搜素支持 Firecrawl
+- AI 提供商支持 DeepSeek，OpenRouter 和 Ollama，联网搜索支持 Firecrawl
 - 支持检查项目更新
 - 支持重新生成报告
 - 一般性优化和改进

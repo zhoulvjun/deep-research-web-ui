@@ -38,7 +38,9 @@
         "tavily": {
           "help": "和 Firecrawl 类似，不过提供了每月 1000 次免费搜索。在 {0} 获取一个 API key。"
         }
-      }
+      },
+      "concurrencyLimit": "并发数",
+      "concurrencyLimitHelp": "限制同时进行的搜索数量。这样可以避免被 API 服务限流，导致请求失败。"
     }
   },
   "researchTopic": {

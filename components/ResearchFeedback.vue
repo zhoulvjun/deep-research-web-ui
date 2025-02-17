@@ -19,7 +19,7 @@
   }>()
 
   const { t, locale } = useI18n()
-  const { config, showConfigManager } = storeToRefs(useConfigStore())
+  const { showConfigManager, isConfigValid } = storeToRefs(useConfigStore())
   const toast = useToast()
 
   const reasoningContent = ref('')
@@ -41,10 +41,7 @@
   )
 
   async function getFeedback() {
-    const aiConfig = config.value.ai
-    const webSearchConfig = config.value.webSearch
-
-    if (!aiConfig.model || !aiConfig.apiKey || !webSearchConfig.apiKey) {
+    if (!isConfigValid.value) {
       toast.add({
         title: t('index.missingConfigTitle'),
         description: t('index.missingConfigDescription'),

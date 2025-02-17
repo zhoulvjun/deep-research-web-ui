@@ -93,6 +93,7 @@
     nodes.value = [defaultRootNode()]
     edges.value = []
     layoutGraph()
+    hasUserInteraction = false
   }
 
   function handleDrag(e: PointerEvent | FlowEvents['move']) {

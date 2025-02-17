@@ -55,6 +55,10 @@ export default defineNuxtConfig({
     },
   },
 
+  nitro: {
+    compressPublicAssets: { brotli: true, gzip: true },
+  },
+
   css: ['~/assets/css/main.css'],
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },

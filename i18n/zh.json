@@ -22,7 +22,11 @@
       "providers": {
         "openaiCompatible": {
           "title": "OpenAI Compatible",
-          "description": "如 OpenAI、Gemini、Together AI、SiliconCloud……\n注：DeepSeek、OpenRouter 和 Ollama 现在已经有了独立选项，请切换使用。"
+          "description": "任意兼容 OpenAI 接口格式的供应商。\n注：为了改进兼容性，部分供应商有单独的选项，请展开查看。"
+        },
+        "siliconflow": {
+          "title": "SiliconFlow 硅基流动",
+          "description": "注册赠送 ¥14 元免费额度。在 {0} 生成一个 API key。"
         }
       }
     },

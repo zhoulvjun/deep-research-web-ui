@@ -22,7 +22,11 @@
       "providers": {
         "openaiCompatible": {
           "title": "OpenAI Compatible",
-          "description": "e.g. OpenAI, Gemini, Together AI, SiliconCloud, ...\n(Note: DeepSeek, OpenRouter and Ollama now have their own providers.)"
+          "description": "Every provider that is compatible with the OpenAI API. Note: Some providers have their own options for better performance."
+        },
+        "siliconflow": {
+          "title": "SiliconFlow",
+          "description": "Offers ¥14 free credits on register. Get one API key at {0}."
         }
       }
     },

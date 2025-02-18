@@ -23,8 +23,19 @@
   const aiProviderOptions = computed(() => [
     {
       label: t('settings.ai.providers.openaiCompatible.title'),
-      help: t('settings.ai.providers.openaiCompatible.description'),
+      help: 'settings.ai.providers.openaiCompatible.description',
+      // Only kept for easy reference in i18n Ally
+      _help: t('settings.ai.providers.openaiCompatible.description'),
       value: 'openai-compatible',
+    },
+    {
+      label: t('settings.ai.providers.siliconflow.title'),
+      help: 'settings.ai.providers.siliconflow.description',
+      // Only kept for easy reference in i18n Ally
+      _help: t('settings.ai.providers.siliconflow.description'),
+      value: 'siliconflow',
+      link: 'https://cloud.siliconflow.cn/i/J0NHrrX8',
+      linkText: 'cloud.siliconflow.cn',
     },
     {
       label: 'DeepSeek',
@@ -141,14 +152,26 @@
           <!-- AI provider -->
           <h3 class="font-bold">{{ $t('settings.ai.provider') }}</h3>
           <UFormField>
-            <template v-if="selectedAiProvider" #help>
-              <span class="whitespace-pre-wrap">
-                {{ selectedAiProvider.help }}
-              </span>
+            <template v-if="selectedAiProvider?.help" #help>
+              <i18n-t
+                class="whitespace-pre-wrap"
+                :keypath="selectedAiProvider.help"
+                tag="span"
+              >
+                <UButton
+                  v-if="selectedAiProvider.link"
+                  class="!p-0"
+                  :to="selectedAiProvider.link"
+                  target="_blank"
+                  variant="link"
+                >
+                  {{ selectedAiProvider.linkText || selectedAiProvider.link }}
+                </UButton>
+              </i18n-t>
             </template>
             <USelect
               v-model="config.ai.provider"
-              class="w-auto"
+              class="w-full"
               :items="aiProviderOptions"
             />
           </UFormField>

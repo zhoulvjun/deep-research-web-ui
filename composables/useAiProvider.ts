@@ -21,6 +21,7 @@ export const useAiModel = () => {
     })
   } else if (
     config.ai.provider === 'deepseek' ||
+    config.ai.provider === 'siliconflow' ||
     // Special case if model name includes 'deepseek'
     // This ensures compatibilty with providers like Siliconflow
     config.ai.model?.toLowerCase().includes('deepseek')

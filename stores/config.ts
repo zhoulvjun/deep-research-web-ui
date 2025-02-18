@@ -20,6 +20,8 @@ export interface ConfigAi {
 export interface ConfigWebSearch {
   provider: ConfigWebSearchProvider
   apiKey?: string
+  /** API base. Currently only works with Firecrawl */
+  apiBase?: string
   /** Force the LLM to generate serp queries in a certain language */
   searchLanguage?: Locale
   /** Limit the number of concurrent tasks globally */
@@ -78,6 +80,15 @@ export const useConfigStore = defineStore('config', () => {
     }
     return ai.apiBase || 'https://api.openai.com/v1'
   })
+  const webSearchApiBase = computed(() => {
+    const { webSearch } = config.value
+    if (webSearch.provider === 'tavily') {
+      return
+    }
+    if (webSearch.provider === 'firecrawl') {
+      return webSearch.apiBase || 'https://api.firecrawl.dev'
+    }
+  })
 
   const showConfigManager = ref(false)
 
@@ -85,6 +96,7 @@ export const useConfigStore = defineStore('config', () => {
     config: skipHydrate(config),
     isConfigValid,
     aiApiBase,
+    webSearchApiBase,
     showConfigManager,
     dismissUpdateVersion: skipHydrate(dismissUpdateVersion),
   }

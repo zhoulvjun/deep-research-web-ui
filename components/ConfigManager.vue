@@ -11,6 +11,7 @@
   const {
     config,
     aiApiBase,
+    webSearchApiBase,
     showConfigManager: showModal,
   } = storeToRefs(useConfigStore())
   const { t } = useI18n()
@@ -66,6 +67,7 @@
       // Only kept for easy reference in i18n Ally
       _help: t('settings.webSearch.providers.firecrawl.help'),
       link: 'https://www.firecrawl.dev/app/api-keys',
+      supportsCustomApiBase: true,
     },
   ])
   const selectedAiProvider = computed(() =>
@@ -121,6 +123,7 @@
     config.value.ai.model = model
   }
 
+  // Automatically fetch AI models list
   watch(
     () => [
       config.value.ai.provider,
@@ -133,6 +136,24 @@
       debouncedListAiModels()
     },
     { immediate: true },
+  )
+  // Reset AI config when provider changed
+  watch(
+    () => config.value.ai.provider,
+    () => {
+      config.value.ai.apiKey = ''
+      config.value.ai.apiBase = ''
+      config.value.ai.model = ''
+      config.value.ai.contextSize = undefined
+    },
+  )
+  // Reset web search config when provider changed
+  watch(
+    () => config.value.webSearch.provider,
+    () => {
+      config.value.webSearch.apiKey = ''
+      config.value.webSearch.apiBase = ''
+    },
   )
 
   defineExpose({
@@ -250,15 +271,28 @@
             </template>
             <USelect
               v-model="config.webSearch.provider"
-              class="w-auto"
+              class="w-30"
               :items="webSearchProviderOptions"
             />
           </UFormField>
-          <UFormField :label="$t('settings.webSearch.apiKey')" required>
+          <UFormField
+            :label="$t('settings.webSearch.apiKey')"
+            :required="!config.webSearch.apiBase"
+          >
             <PasswordInput
               v-model="config.webSearch.apiKey"
               class="w-full"
               :placeholder="$t('settings.webSearch.apiKey')"
+            />
+          </UFormField>
+          <UFormField
+            v-if="selectedWebSearchProvider?.supportsCustomApiBase"
+            :label="$t('settings.webSearch.apiBase')"
+          >
+            <UInput
+              v-model="config.webSearch.apiBase"
+              class="w-full"
+              :placeholder="webSearchApiBase"
             />
           </UFormField>
           <UFormField :label="$t('settings.webSearch.queryLanguage')">

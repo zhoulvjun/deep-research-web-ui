@@ -40,11 +40,12 @@
           "help": "Similar to Firecrawl, but provides 1000 free credits / month. Get one API key at {0}."
         },
         "firecrawl": {
-          "help": "Get one API key at {0}."
+          "help": "Get one API key at {0} if you are using the official service."
         }
       },
       "concurrencyLimitHelp": "Limit the concurrent search tasks. This is useful to avoid overloading the search provider and causing requests to fail.",
-      "concurrencyLimit": "Concurrency Limit"
+      "concurrencyLimit": "Concurrency Limit",
+      "apiBase": "API Base URL"
     }
   },
   "researchTopic": {
@@ -74,7 +75,6 @@
     "clickToView": "Click a child node to view details.",
     "nodeDetails": "Node Details",
     "startNode": {
-      "label": "Start",
       "description": "This is the beginning of your deep research journey!"
     },
     "researchGoal": "Research Goal",

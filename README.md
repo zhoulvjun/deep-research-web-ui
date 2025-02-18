@@ -9,7 +9,7 @@ Features:
 - 🚀 **Safe & Secure**: Everything (config, API requests, ...) stays in your browser locally
 - 🕙 **Realtime feedback**: Stream AI responses and reflect on the UI in real-time
 - 🌳 **Search visualization**: Shows the research process using a tree structure. Supports searching in different languages
-- 📄 **Export as PDF**: Export the final research report as a PDF
+- 📄 **Export as PDF**: Export the final research report as Markdown / PDF
 - 🤖 **Supports more models**: Uses plain prompts instead of newer, less widely supported features like Structured Outputs. This ensures to work with more providers that haven't caught up with the latest OpenAI capabilities.
 - 🐳 **Docker support**: Deploy in your environment in one-line command
 

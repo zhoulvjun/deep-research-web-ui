@@ -39,7 +39,9 @@ function validateConfig(config: Config) {
   if (typeof ai.contextSize !== 'undefined' && ai.contextSize < 0) return false
 
   const ws = config.webSearch
-  if (!ws.apiKey) return false
+  if (ws.provider === 'tavily' && !ws.apiKey) return false
+  // Either apiBase or apiKey is required for firecrawl
+  if (ws.provider === 'firecrawl' && !ws.apiBase && !ws.apiKey) return false
   if (typeof ws.concurrencyLimit !== 'undefined' && ws.concurrencyLimit! < 1)
     return false
   return true

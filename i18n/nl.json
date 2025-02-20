@@ -1,0 +1,113 @@
+{
+  "language": "Nederlands",
+  "modelThinking": "Nadenken...",
+  "modelThinkingComplete": "Nadenken klaar",
+  "invalidStructuredOutput": "Het model heeft content geretourneerd die onvolledig of ongeldig is en niet kan worden verwerkt. Probeer een groter of \"slimmer\" model te gebruiken.",
+  "index": {
+    "projectDescription": "Dit is een Web-UI voor {0} waarmee AI online kan zoeken en zelf dieper kan graven op basis van specifieke vragen, en vervolgens een onderzoeksrapport kan genereren.\nDit project bevat AI-reacties voor realtime feedback en visualisatie van het onderzoeksproces met behulp van een boomdiagram.\nAlle API-aanvragen worden direct vanuit uw browser verzonden. Er worden geen gegevens extern opgeslagen.",
+    "missingConfigTitle": "Configuratie niet compleet",
+    "missingConfigDescription": "Voor dit project moet u uw eigen API-sleutels meenemen."
+  },
+  "settings": {
+    "title": "Instellingen",
+    "disclaimer": "Instellingen zijn lokaal opgeslagen in de browser.",
+    "save": "Opslaan",
+    "ai": {
+      "provider": "AI Provider",
+      "apiKey": "API sleutel",
+      "apiBase": "API Basis-URL",
+      "model": "Model",
+      "contextSize": "Contextlengte",
+      "contextSizeHelp": "Het maximale aantal tokens dat naar het model wordt verzonden. Kan niet groter zijn dan de contextlengte van het model.",
+      "providers": {
+        "openaiCompatible": {
+          "title": "OpenAI-compatible",
+          "description": "Elke provider die compatibel is met de OpenAI-API. Let op: Sommige providers hebben hun eigen opties voor betere prestaties."
+        },
+        "siliconflow": {
+          "title": "SiliconFlow",
+          "description": "Biedt ¥14 (€1,85) gratis credits bij registratie. Krijg één API-sleutel bij {0}."
+        }
+      }
+    },
+    "webSearch": {
+      "provider": "Zoekmachine provider",
+      "apiKey": "API-sleutel",
+      "queryLanguage": "Zoekopdracht taal",
+      "queryLanguageHelp": "De taal van de zoekopdracht. Handig als u zoekresultaten in een andere taal wilt krijgen.\nBij het schrijven van conclusies gebruikt het AI-model nog steeds dezelfde taal als de web-UI.",
+      "providers": {
+        "tavily": {
+          "help": "Vergelijkbaar met Firecrawl, maar biedt 1000 gratis credits / maand. Krijg één API-sleutel bij {0}.",
+          "advancedSearch": "Uitgebreid zoeken",
+          "advancedSearchHelp": "Verkrijg betere resultaten. Kost elke keer 1 credit extra.",
+          "searchTopic": "Zoekonderwerp",
+          "searchTopicHelp": "Optimaliseer de zoekopdracht voor het geselecteerde onderwerp met op maat gemaakte en samengestelde informatie. Standaard 'general'."
+        },
+        "firecrawl": {
+          "help": "Ontvang een API-sleutel bij {0} als u de officiële service gebruikt."
+        }
+      },
+      "concurrencyLimitHelp": "Beperk de gelijktijdige zoektaken. Dit is handig om te voorkomen dat de zoekmachine overbelast raakt en verzoeken mislukken.",
+      "concurrencyLimit": "Concurrency Limit",
+      "apiBase": "API Basis-URL"
+    }
+  },
+  "researchTopic": {
+    "title": "1. Onderzoeksonderwerp",
+    "inputTitle": "Onderzoeksonderwerp",
+    "placeholder": "Wat je maar wilt onderzoeken...",
+    "numOfQuestions": "Aantal vragen",
+    "numOfQuestionsHelp": "Het aantal vervolgvragen ter verduidelijking.",
+    "depth": "Diepte",
+    "depthHelp": "Aantal iteraties.",
+    "breadth": "Breedte",
+    "breadthHelp": "Aantal zoekopdrachten in de eerste iteratie. De zoekbreedte van elke iteratie is de helft van de vorige.",
+    "start": "Begin Onderzoek",
+    "researching": "Onderzoeken..."
+  },
+  "modelFeedback": {
+    "title": "2. Modelfeedback",
+    "description": "De AI stelt u een aantal vervolgvragen om de onderzoeksrichting te verduidelijken.",
+    "waiting": "Wachten op feedback van het model...",
+    "submit": "Antwoord versturen",
+    "error": "Fout bij het ontvangen van feedback: {0}",
+    "noQuestions": "Het model heeft geen vervolgvragen geretourneerd."
+  },
+  "webBrowsing": {
+    "title": "3. Zoeken op het Internet",
+    "description": "De AI zal vervolgens het internet doorzoeken op basis van ons onderzoeksdoel, en herhalen totdat de diepte is bereikt.",
+    "clickToView": "Klik op een onderliggend knooppunt om details te bekijken.",
+    "nodeDetails": "Knooppuntdetails",
+    "startNode": {
+      "description": "Dit is het begin van uw diepgaande onderzoeksreis!"
+    },
+    "researchGoal": "Onderzoeksdoel",
+    "visitedUrls": "Bezochte websites",
+    "learnings": "Lessen",
+    "generating": "Genereren...",
+    "nodeFailed": "Zoeken mislukt",
+    "nodeFailedToast": "Zoekknooppunt \"{label}\" is mislukt",
+    "followUpQuestions": "Vervolgvragen"
+  },
+  "researchReport": {
+    "title": "4. Onderzoeksrapport",
+    "exportPdf": "PDF exporteren",
+    "exportMarkdown": "Markdown exporteren",
+    "sources": "Bronnen",
+    "waiting": "Wachten op het rapport...",
+    "generating": "Rapport genereren...",
+    "error": "Rapport genereren mislukt: {0}",
+    "downloadingFonts": "Het downloaden van de benodigde lettertypen kan enige tijd duren...",
+    "downloadFontFailed": "Downloaden van lettertype mislukt",
+    "regenerate": "Regenereren"
+  },
+  "error": {
+    "requestBlockedByCORS": "De huidige API-provider staat mogelijk geen cross-origin-verzoeken toe. Probeer een andere API-provider of neem contact op met de provider voor ondersteuning.."
+  },
+  "autoUpdate": {
+    "newVersionTitle": "Nieuwe versie beschikbaar: {0}",
+    "newVersionDescription": "Let op: Als u een zelfgehoste versie gebruikt, implementeer deze dan opnieuw om nieuwe functies en bugfixes te krijgen.",
+    "refresh": "Pagina vernieuwen",
+    "dismiss": "Afwijzen"
+  }
+}

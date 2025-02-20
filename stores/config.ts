@@ -26,6 +26,10 @@ export interface ConfigWebSearch {
   searchLanguage?: Locale
   /** Limit the number of concurrent tasks globally */
   concurrencyLimit?: number
+  /** Tavily: use advanced search to retrieve higher quality results */
+  tavilyAdvancedSearch?: boolean
+  /** Tavily: search topic. Defaults to `general` */
+  tavilySearchTopic?: 'general' | 'news' | 'finance'
 }
 
 export interface Config {

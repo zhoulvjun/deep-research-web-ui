@@ -47,7 +47,11 @@ export const useWebSearch = (): WebSearchFunction => {
         apiKey: config.webSearch.apiKey,
       })
       return async (q: string, o: WebSearchOptions) => {
-        const results = await tvly.search(q, o)
+        const results = await tvly.search(q, {
+          ...o,
+          searchDepth: config.webSearch.tavilyAdvancedSearch ? 'advanced' : 'basic',
+          topic: config.webSearch.tavilySearchTopic,
+        })
         return results.results
           .filter((x) => !!x?.content && !!x.url)
           .map((r) => ({

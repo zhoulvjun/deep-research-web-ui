@@ -40,7 +40,11 @@
           "help": "如果你使用的是官方服务，请在 {0} 获取 API key。"
         },
         "tavily": {
-          "help": "和 Firecrawl 类似，不过提供了每月 1000 次免费搜索。在 {0} 获取一个 API key。"
+          "help": "和 Firecrawl 类似，不过提供了每月 1000 次免费搜索。在 {0} 获取一个 API key。",
+          "advancedSearchHelp": "获得更高质量的搜索结果。每次多消耗一个搜索点数 (credit)。",
+          "searchTopic": "搜索领域",
+          "advancedSearch": "高质量搜索",
+          "searchTopicHelp": "搜索特定领域的信息，获得更精确的结果。默认为“通用” (general)。"
         }
       },
       "concurrencyLimit": "并发数",

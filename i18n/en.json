@@ -37,7 +37,11 @@
       "queryLanguageHelp": "The language of the search query. Useful if you want to get search results in a different language.\nWhen writing conclusions, the AI model will still use the language same as the web UI.",
       "providers": {
         "tavily": {
-          "help": "Similar to Firecrawl, but provides 1000 free credits / month. Get one API key at {0}."
+          "help": "Similar to Firecrawl, but provides 1000 free credits / month. Get one API key at {0}.",
+          "advancedSearch": "Advanced Search",
+          "advancedSearchHelp": "Get higher quality search results. Costs 1 extra credit each time.",
+          "searchTopic": "Search Topic",
+          "searchTopicHelp": "Optimize the search for the selected topic with tailored and curated information. Defaults to 'general'."
         },
         "firecrawl": {
           "help": "Get one API key at {0} if you are using the official service."

@@ -70,6 +70,7 @@
       supportsCustomApiBase: true,
     },
   ])
+  const tavilySearchTopicOptions = ['general', 'news', 'finance']
   const selectedAiProvider = computed(() =>
     aiProviderOptions.value.find((o) => o.value === config.value.ai.provider),
   )
@@ -323,6 +324,27 @@
               :step="1"
             />
           </UFormField>
+
+          <!-- Tavily-specific settings -->
+          <template v-if="config.webSearch.provider === 'tavily'">
+            <UFormField
+              :label="$t('settings.webSearch.providers.tavily.advancedSearch')"
+              :help="$t('settings.webSearch.providers.tavily.advancedSearchHelp')"
+            >
+              <USwitch v-model="config.webSearch.tavilyAdvancedSearch" />
+            </UFormField>
+            <UFormField
+              :label="$t('settings.webSearch.providers.tavily.searchTopic')"
+              :help="$t('settings.webSearch.providers.tavily.searchTopicHelp')"
+            >
+              <USelect
+                v-model="config.webSearch.tavilySearchTopic"
+                class="w-30"
+                :items="tavilySearchTopicOptions"
+                placeholder="general"
+              />
+            </UFormField>
+          </template>
         </div>
       </template>
       <template #footer>

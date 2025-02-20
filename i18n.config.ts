@@ -9,6 +9,6 @@ export default defineI18nConfig(() => ({
   messages: {
     en,
     zh,
-	  nl,
+    nl,
   },
 }))

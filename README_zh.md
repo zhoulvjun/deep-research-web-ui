@@ -12,11 +12,21 @@
 
 当前支持的供应商：
 
-- AI 服务：OpenAPI 每月 1000 次免费搜索）、Firecrawl
 
-喜欢本项目请点 ⭐ 收藏！ <video width="500" src="https://github.com/user-attachments/assets/8f9baa43-a74e-4613-aebb-1bcc29a686f0" controls></video>
+- AI 服务：OpenAI compatible, SiliconFlow, DeepSeek, OpenRouter, Ollama 等
+- 联网搜索服务：Tavily (每月 1000 次免费搜索), Firecrawl（支持自部署）
+
+喜欢本项目请点 ⭐ 收藏！
+
+ <video width="500" src="https://github.com/user-attachments/assets/8f9baa43-a74e-4613-aebb-1bcc29a686f0" controls></video>
 
 ## 近期更新
+
+25/02/18 - 25/02/20
+
+- Tavily 支持配置“高级搜索”和“搜索领域”选项
+- Firecrawl 支持自部署
+- 总体稳定性改进，降低了出现“无效 JSON 结构”错误的概率
 
 25/02/17
 

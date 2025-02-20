@@ -15,14 +15,20 @@ Features:
 
 Currently available providers:
 
-- AI: OpenAI compatible, DeepSeek, OpenRouter, Ollama
-- Web Search: Tavily (1000 free credits / month), Firecrawl
+- AI: OpenAI compatible, SiliconFlow, DeepSeek, OpenRouter, Ollama and more
+- Web Search: Tavily (1000 free credits / month), Firecrawl (cloud / self-hosted)
 
 Please give a 🌟 Star if you like this project!
 
 <video width="500" src="https://github.com/user-attachments/assets/8f9baa43-a74e-4613-aebb-1bcc29a686f0" controls></video>
 
 ## Recent updates
+
+25/02/18 - 25/02/20
+
+- Added: "advanced search" and "search topic" support for Tavily
+- Added: custom endpoint support for Firecrawl
+- Fixed: overall bug fixes, less "invalid JSON structure" errors
 
 25/02/17
 

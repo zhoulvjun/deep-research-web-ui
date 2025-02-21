@@ -24,7 +24,7 @@
 
 25/02/18 - 25/02/20
 
-- Tavily 支持配置“高级搜索”和“搜索领域”选项
+- Tavily 支持配置“高质量搜索”和“搜索领域”选项
 - Firecrawl 支持自部署
 - 总体稳定性改进，降低了出现“无效 JSON 结构”错误的概率
 
@@ -127,3 +127,7 @@ pnpm preview
 ## 许可协议
 
 MIT 协议
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=AnotiaWang/deep-research-web-ui&type=Date)](https://star-history.com/#AnotiaWang/deep-research-web-ui&Date)

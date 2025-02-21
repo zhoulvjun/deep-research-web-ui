@@ -131,3 +131,7 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 ## License
 
 MIT
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=AnotiaWang/deep-research-web-ui&type=Date)](https://star-history.com/#AnotiaWang/deep-research-web-ui&Date)

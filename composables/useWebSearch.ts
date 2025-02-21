@@ -28,7 +28,12 @@ export const useWebSearch = (): WebSearchFunction => {
         apiUrl: webSearchApiBase,
       })
       return async (q: string, o: WebSearchOptions) => {
-        const results = await fc.search(q, o)
+        const results = await fc.search(q, {
+          ...o,
+          scrapeOptions: {
+            formats: ['markdown']
+          }
+        })
         if (results.error) {
           throw new Error(results.error)
         }

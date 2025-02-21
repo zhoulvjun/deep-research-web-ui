@@ -404,7 +404,7 @@ export async function deepResearch({
             onProgress({
               type: 'node_complete',
               result: {
-                learnings: allLearnings,
+                learnings: searchResult.learnings ?? [],
                 followUpQuestions: searchResult.followUpQuestions ?? [],
               },
               nodeId: childNodeId(nodeId, i),

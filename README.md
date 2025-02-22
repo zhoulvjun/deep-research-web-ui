@@ -24,6 +24,13 @@ Please give a 🌟 Star if you like this project!
 
 ## Recent updates
 
+25/02/22
+
+- Added: NL/Dutch translation
+- Added: Retry failed nodes in web search
+- Fixed: Web search node sometimes shows empty label and duplicated learnings
+- Fixed: Firecrawl now limits scrape content format to `Markdown`
+
 25/02/18 - 25/02/20
 
 - Added: "advanced search" and "search topic" support for Tavily

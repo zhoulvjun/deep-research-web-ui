@@ -70,14 +70,13 @@ export async function* parseStreamingJson<T extends z.ZodType>(
           type: 'object',
           value: parsed.value as DeepPartial<z.infer<T>>,
         }
-      } else {
-        console.debug(`Failed to parse JSON: ${removeJsonMarkdown(rawText)}`)
       }
     }
   }
 
   // If the last chunk parses failed, return an error
   if (!isParseSuccessful) {
+    console.warn(`[parseStreamingJson] Failed to parse JSON: ${removeJsonMarkdown(rawText)}`)
     yield {
       type: 'bad-end',
       rawText,

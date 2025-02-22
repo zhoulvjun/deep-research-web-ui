@@ -12,6 +12,7 @@
   } from '~/constants/injection-keys'
   import Flow from './SearchFlow.vue'
   import SearchFlow from './SearchFlow.vue'
+  import { isChildNode, isParentNode, isRootNode } from '~/utils/tree-node'
 
   export type DeepResearchNodeStatus = Exclude<ResearchStep['type'], 'complete'>
 
@@ -115,7 +116,7 @@
           }
         }
         // Update the node
-        if (!isRootNode(node)) {
+        if (!isRootNode(node.id)) {
           node.label = step.result.query ?? ''
           node.researchGoal = step.result.researchGoal
         }
@@ -196,10 +197,6 @@
     }
   }
 
-  function isRootNode(node: DeepResearchNode) {
-    return node.id === '0'
-  }
-
   function selectNode(nodeId: string) {
     if (selectedNodeId.value === nodeId) {
       selectedNodeId.value = undefined
@@ -208,35 +205,101 @@
     }
   }
 
-  async function startResearch() {
+  async function startResearch(retryNode?: DeepResearchNode) {
     if (!form.value.query || !form.value.breadth || !form.value.depth) return
 
-    nodes.value = [{ ...rootNode }]
-    selectedNodeId.value = undefined
-    searchResults.value = {}
-    isLoading.value = true
-    flowRef.value?.clearNodes()
+    // 如果不是重试，清空所有节点
+    if (!retryNode) {
+      nodes.value = [{ ...rootNode }]
+      selectedNodeId.value = undefined
+      searchResults.value = {}
+      flowRef.value?.clearNodes()
+      isLoading.value = true
+    }
 
     // Wait after the flow is cleared
     await new Promise((r) => requestAnimationFrame(r))
 
     try {
-      const searchLanguage = config.value.webSearch.searchLanguage
-        ? t('language', {}, { locale: config.value.webSearch.searchLanguage })
-        : undefined
+      let query = getCombinedQuery(form.value, feedback.value)
+      let existingLearnings: string[] = []
+      let existingVisitedUrls: string[] = []
+      let currentDepth = 1
+      let breadth = form.value.breadth
+
+      if (retryNode) {
+        query = retryNode.label
+        // Set the search depth and breadth to its parent's
+        if (!isRootNode(retryNode.id)) {
+          const parentId = parentNodeId(retryNode.id)!
+          currentDepth = nodeDepth(parentId)
+          breadth = searchBreadth(breadth, parentId)
+        }
+        // Collect all parent nodes' learnings and visitedUrls
+        const parentNodes = nodes.value.filter((n) =>
+          isParentNode(n.id, retryNode.id),
+        )
+        existingLearnings = parentNodes
+          .flatMap((n) => n.learnings || [])
+          .filter(Boolean)
+        existingVisitedUrls = parentNodes
+          .flatMap((n) => n.searchResults || [])
+          .map((r) => r.url)
+          .filter(Boolean)
+      }
+
       await deepResearch({
-        query: getCombinedQuery(form.value, feedback.value),
+        query,
+        retryNode,
+        currentDepth,
+        breadth,
         maxDepth: form.value.depth,
-        breadth: form.value.breadth,
         languageCode: locale.value,
-        searchLanguage,
+        learnings: existingLearnings,
+        visitedUrls: existingVisitedUrls,
         onProgress: handleResearchProgress,
       })
     } catch (error) {
       console.error('Research failed:', error)
     } finally {
-      isLoading.value = false
+      if (!retryNode) {
+        isLoading.value = false
+      }
     }
+  }
+
+  async function retryNode(nodeId: string) {
+    console.log('[DeepResearch] retryNode', nodeId, isLoading.value)
+    if (!nodeId || isLoading.value) return
+
+    // Remove all child nodes first
+    nodes.value = nodes.value.filter((n) => !isChildNode(nodeId, n.id))
+    flowRef.value?.removeChildNodes(nodeId)
+
+    const node = nodes.value.find((n) => n.id === nodeId)
+    // Take a clone of the node
+    // Used in `deepResearch()` to access the node's original query and searchGoal
+    let nodeCurrentData: DeepResearchNode | undefined
+
+    if (node) {
+      nodeCurrentData = { ...node }
+      node.status = undefined
+      node.error = undefined
+      node.searchResults = undefined
+      node.learnings = undefined
+      node.generateLearningsReasoning = undefined
+      node.generateQueriesReasoning = undefined
+
+      // Remove related search results
+      delete searchResults.value[nodeId]
+      Object.keys(searchResults.value).forEach((key) => {
+        if (isChildNode(nodeId, key)) {
+          delete searchResults.value[key]
+        }
+      })
+    }
+
+    await startResearch(nodeCurrentData)
   }
 
   defineExpose({
@@ -273,6 +336,11 @@
           color="error"
           variant="soft"
           :duration="8000"
+          :actions="[{
+            label: $t('webBrowsing.retry'),
+            color: 'secondary',
+            onClick: () => retryNode(selectedNode!.id),
+          }]"
         />
         <h2 class="text-xl font-bold my-2">
           {{ selectedNode.label ?? $t('webBrowsing.generating') }}
@@ -283,7 +351,7 @@
           {{ t('webBrowsing.researchGoal') }}
         </h3>
         <!-- Root node has no additional information -->
-        <p v-if="isRootNode(selectedNode)">
+        <p v-if="isRootNode(selectedNode.id)">
           {{ t('webBrowsing.startNode.description') }}
         </p>
         <p

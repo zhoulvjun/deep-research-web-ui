@@ -7,6 +7,7 @@ import { languagePrompt, systemPrompt } from './prompt'
 import zodToJsonSchema from 'zod-to-json-schema'
 import { useAiModel } from '~/composables/useAiProvider'
 import type { Locale } from '~/components/LangSwitcher.vue'
+import type { DeepResearchNode } from '~/components/DeepResearch/DeepResearch.vue'
 
 export type ResearchResult = {
   learnings: string[]
@@ -221,99 +222,119 @@ export async function deepResearch({
   learnings = [],
   visitedUrls = [],
   onProgress,
-  currentDepth = 1,
+  currentDepth,
   nodeId = '0',
-  searchLanguage,
+  retryNode,
 }: {
   query: string
   breadth: number
   maxDepth: number
-  /** Language code */
+  /** Language code for SERP queries and web searches */
   languageCode: Locale
+  /** Accumulated learnings from all nodes visited so far */
   learnings?: string[]
+  /** Accumulated visited URLs from all nodes visited so far */
   visitedUrls?: string[]
-  onProgress: (step: ResearchStep) => void
-  currentDepth?: number
+  currentDepth: number
+  /** Current node ID. Used for recursive calls */
   nodeId?: string
-  /** Force the LLM to generate serp queries in a certain language */
-  searchLanguage?: string
+  /** The Node ID to retry. Passed from DeepResearch.vue */
+  retryNode?: DeepResearchNode
+  onProgress: (step: ResearchStep) => void
 }): Promise<ResearchResult> {
   const { t } = useNuxtApp().$i18n
   const language = t('language', {}, { locale: languageCode })
   const globalLimit = usePLimit()
 
   try {
-    const searchQueriesResult = generateSearchQueries({
-      query,
-      learnings,
-      numQueries: breadth,
-      language,
-      searchLanguage,
-    })
+    let searchQueries: Array<PartialSearchQuery & { nodeId: string }> = []
 
-    let searchQueries: PartialSearchQuery[] = []
-
-    for await (const chunk of parseStreamingJson(
-      searchQueriesResult.fullStream,
-      searchQueriesTypeSchema,
-      (value) => !!value.queries?.length && !!value.queries[0]?.query,
-    )) {
-      if (chunk.type === 'object' && chunk.value.queries) {
-        // Temporary fix: Exclude queries that equals `undefined`
-        // Currently only being reported to be seen on GPT-4o, where the model simply returns `undefined` for certain questions
-        // https://github.com/AnotiaWang/deep-research-web-ui/issues/7
-        searchQueries = chunk.value.queries.filter(
-          (q) => q.query !== 'undefined',
-        )
-        for (let i = 0; i < searchQueries.length; i++) {
-          onProgress({
-            type: 'generating_query',
-            result: searchQueries[i],
-            nodeId: childNodeId(nodeId, i),
-            parentNodeId: nodeId,
-          })
-        }
-      } else if (chunk.type === 'reasoning') {
-        // Reasoning part goes to the parent node
-        onProgress({
-          type: 'generating_query_reasoning',
-          delta: chunk.delta,
+    // If retryNode is provided and not a root node, just use the query from the node
+    if (retryNode && retryNode.id !== '0') {
+      nodeId = retryNode.id
+      searchQueries = [
+        {
+          query: retryNode.label,
+          researchGoal: retryNode.researchGoal,
           nodeId,
-        })
-      } else if (chunk.type === 'error') {
-        onProgress({
-          type: 'error',
-          message: chunk.message,
-          nodeId,
-        })
-        break
-      } else if (chunk.type === 'bad-end') {
-        onProgress({
-          type: 'error',
-          message: t('invalidStructuredOutput'),
-          nodeId,
-        })
-        break
-      }
+        },
+      ]
     }
-
-    onProgress({
-      type: 'node_complete',
-      nodeId,
-    })
-
-    for (let i = 0; i < searchQueries.length; i++) {
-      onProgress({
-        type: 'generated_query',
+    // Otherwise (fresh start or retrying on root node)
+    else {
+      const searchQueriesResult = generateSearchQueries({
         query,
-        result: searchQueries[i],
-        nodeId: childNodeId(nodeId, i),
+        learnings,
+        numQueries: breadth,
+        language,
+        searchLanguage: language,
       })
+
+      for await (const chunk of parseStreamingJson(
+        searchQueriesResult.fullStream,
+        searchQueriesTypeSchema,
+        (value) => !!value.queries?.length && !!value.queries[0]?.query,
+      )) {
+        if (chunk.type === 'object' && chunk.value.queries) {
+          // Temporary fix: Exclude queries that equals `undefined`
+          // Currently only being reported to be seen on GPT-4o, where the model simply returns `undefined` for certain questions
+          // https://github.com/AnotiaWang/deep-research-web-ui/issues/7
+          searchQueries = chunk.value.queries
+            .filter((q) => q.query !== 'undefined')
+            .map((q, i) => ({
+              ...q,
+              nodeId: childNodeId(nodeId, i),
+            }))
+          for (let i = 0; i < searchQueries.length; i++) {
+            onProgress({
+              type: 'generating_query',
+              result: searchQueries[i],
+              nodeId: searchQueries[i].nodeId,
+              parentNodeId: nodeId,
+            })
+          }
+        } else if (chunk.type === 'reasoning') {
+          // Reasoning part goes to the parent node
+          onProgress({
+            type: 'generating_query_reasoning',
+            delta: chunk.delta,
+            nodeId,
+          })
+        } else if (chunk.type === 'error') {
+          onProgress({
+            type: 'error',
+            message: chunk.message,
+            nodeId,
+          })
+          break
+        } else if (chunk.type === 'bad-end') {
+          onProgress({
+            type: 'error',
+            message: t('invalidStructuredOutput'),
+            nodeId,
+          })
+          break
+        }
+      }
+
+      onProgress({
+        type: 'node_complete',
+        nodeId,
+      })
+
+      for (const searchQuery of searchQueries) {
+        onProgress({
+          type: 'generated_query',
+          query: searchQuery.query!,
+          result: searchQuery,
+          nodeId: searchQuery.nodeId,
+        })
+      }
     }
 
     // Run in parallel and limit the concurrency
     const results = await Promise.all(
-      searchQueries.map((searchQuery, i) =>
+      searchQueries.map((searchQuery) =>
         globalLimit(async () => {
           if (!searchQuery?.query) {
             return {
@@ -324,7 +345,7 @@ export async function deepResearch({
           onProgress({
             type: 'searching',
             query: searchQuery.query,
-            nodeId: childNodeId(nodeId, i),
+            nodeId: searchQuery.nodeId,
           })
           try {
             // search the web
@@ -341,7 +362,7 @@ export async function deepResearch({
             onProgress({
               type: 'search_complete',
               results,
-              nodeId: childNodeId(nodeId, i),
+              nodeId: searchQuery.nodeId,
             })
             // Breadth for the next search is half of the current breadth
             const nextBreadth = Math.ceil(breadth / 2)
@@ -359,33 +380,32 @@ export async function deepResearch({
               searchResultTypeSchema,
               (value) => !!value.learnings?.length,
             )) {
-              const id = childNodeId(nodeId, i)
               if (chunk.type === 'object') {
                 searchResult = chunk.value
                 onProgress({
                   type: 'processing_serach_result',
                   result: chunk.value,
                   query: searchQuery.query,
-                  nodeId: id,
+                  nodeId: searchQuery.nodeId,
                 })
               } else if (chunk.type === 'reasoning') {
                 onProgress({
                   type: 'processing_serach_result_reasoning',
                   delta: chunk.delta,
-                  nodeId: id,
+                  nodeId: searchQuery.nodeId,
                 })
               } else if (chunk.type === 'error') {
                 onProgress({
                   type: 'error',
                   message: chunk.message,
-                  nodeId: id,
+                  nodeId: searchQuery.nodeId,
                 })
                 break
               } else if (chunk.type === 'bad-end') {
                 onProgress({
                   type: 'error',
                   message: t('invalidStructuredOutput'),
-                  nodeId: id,
+                  nodeId: searchQuery.nodeId,
                 })
                 break
               }
@@ -407,7 +427,7 @@ export async function deepResearch({
                 learnings: searchResult.learnings ?? [],
                 followUpQuestions: searchResult.followUpQuestions ?? [],
               },
-              nodeId: childNodeId(nodeId, i),
+              nodeId: searchQuery.nodeId,
             })
 
             if (
@@ -436,9 +456,8 @@ export async function deepResearch({
                   visitedUrls: allUrls,
                   onProgress,
                   currentDepth: nextDepth,
-                  nodeId: childNodeId(nodeId, i),
+                  nodeId: searchQuery.nodeId,
                   languageCode,
-                  searchLanguage,
                 })
                 return r
               } catch (error) {
@@ -453,15 +472,14 @@ export async function deepResearch({
               }
             }
           } catch (e: any) {
-            const id = childNodeId(nodeId, i)
             console.error(
-              `Error in node ${id} for query ${searchQuery.query}`,
+              `Error in node ${searchQuery.nodeId} for query ${searchQuery.query}`,
               e,
             )
             onProgress({
               type: 'error',
               message: e.message,
-              nodeId: id,
+              nodeId: searchQuery.nodeId,
             })
             return {
               learnings: [],

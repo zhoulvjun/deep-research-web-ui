@@ -96,6 +96,21 @@
     hasUserInteraction = false
   }
 
+  function isChildNode(parentId: string, childId: string) {
+    return childId.length > parentId.length && childId.startsWith(parentId)
+  }
+
+  function removeChildNodes(parentId: string) {
+    const childNodes = nodes.value.filter((n) => isChildNode(parentId, n.id))
+    childNodes.forEach((node) => {
+      // 移除节点和相关的边
+      nodes.value = nodes.value.filter((n) => n.id !== node.id)
+      edges.value = edges.value.filter(
+        (e) => e.source !== node.id && e.target !== node.id,
+      )
+    })
+  }
+
   function handleDrag(e: PointerEvent | FlowEvents['move']) {
     // Triggered by VueFlow internal logic
     if ('event' in e && !e.event.sourceEvent) {
@@ -109,6 +124,7 @@
     addNode,
     updateNode,
     clearNodes,
+    removeChildNodes,
   })
 </script>
 

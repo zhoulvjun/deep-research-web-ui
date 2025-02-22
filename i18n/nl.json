@@ -87,7 +87,8 @@
     "generating": "Genereren...",
     "nodeFailed": "Zoeken mislukt",
     "nodeFailedToast": "Zoekknooppunt \"{label}\" is mislukt",
-    "followUpQuestions": "Vervolgvragen"
+    "followUpQuestions": "Vervolgvragen",
+    "retry": "Opnieuw proberen"
   },
   "researchReport": {
     "title": "4. Onderzoeksrapport",

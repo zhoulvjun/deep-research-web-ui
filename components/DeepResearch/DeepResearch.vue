@@ -9,10 +9,11 @@
     formInjectionKey,
     researchResultInjectionKey,
   } from '~/constants/injection-keys'
-  import Flow from './SearchFlow.vue'
+  import Flow, { type SearchNode, type SearchEdge } from './SearchFlow.vue'
   import SearchFlow from './SearchFlow.vue'
   import NodeDetail from './NodeDetail.vue'
   import { isChildNode, isParentNode, isRootNode } from '~/utils/tree-node'
+  import { UCard, UModal, UButton } from '#components'
 
   export type DeepResearchNodeStatus = Exclude<ResearchStep['type'], 'complete'>
 
@@ -39,7 +40,7 @@
 
   const toast = useToast()
   const { t, locale } = useI18n()
-  const { config } = storeToRefs(useConfigStore())
+  const isLargeScreen = useMediaQuery('(min-width: 768px)')
 
   const flowRef = ref<InstanceType<typeof Flow>>()
   const rootNode: DeepResearchNode = { id: '0', label: 'Start' }
@@ -49,6 +50,12 @@
   const selectedNodeId = ref<string>()
   const searchResults = ref<Record<string, PartialProcessedSearchResult>>({})
   const isLoading = ref(false)
+  const isFullscreen = ref(false)
+  // The edges and nodes of SearchFlow.vue
+  // These are not managed inside SearchFlow, because here we need to switch between
+  // two SearchFlows in fullscreen and non-fullscreen mode
+  const flowNodes = ref<SearchNode[]>([flowRootNode()])
+  const flowEdges = ref<SearchEdge[]>([])
 
   const selectedNode = computed(() => {
     if (selectedNodeId.value) {
@@ -202,19 +209,35 @@
       selectedNodeId.value = undefined
     } else {
       selectedNodeId.value = nodeId
+      flowRef.value?.layoutGraph(true)
+    }
+  }
+
+  // The default root node for SearchFlow
+  function flowRootNode(): SearchNode {
+    return {
+      id: '0',
+      data: { title: 'Start' },
+      position: { x: 0, y: 0 },
+      type: 'search', // We only have this type
     }
   }
 
   async function startResearch(retryNode?: DeepResearchNode) {
     if (!form.value.query || !form.value.breadth || !form.value.depth) return
 
-    // 如果不是重试，清空所有节点
+    // Clear all nodes if it's not a retry
     if (!retryNode) {
       nodes.value = [{ ...rootNode }]
       selectedNodeId.value = undefined
       searchResults.value = {}
-      flowRef.value?.clearNodes()
+      flowNodes.value = [flowRootNode()]
+      flowEdges.value = []
       isLoading.value = true
+      // Wait for the nodes and edges to reflect to `SearchFlow.vue`
+      nextTick(() => {
+        flowRef.value?.reset()
+      })
     }
 
     // Wait after the flow is cleared
@@ -302,6 +325,21 @@
     await startResearch(nodeCurrentData)
   }
 
+  let scrollY = 0
+
+  function toggleFullscreen() {
+    // Because changing `isFullscreen` causes the height of the page to change (UCard disappears and appears)
+    // so we should scroll back to the last position after exiting fullscreen mode.
+    if (!isFullscreen.value) {
+      scrollY = window.scrollY
+    } else {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: scrollY })
+      })
+    }
+    isFullscreen.value = !isFullscreen.value
+  }
+
   defineExpose({
     startResearch,
     isLoading,
@@ -309,18 +347,75 @@
 </script>
 
 <template>
-  <UCard>
+  <UModal v-if="isFullscreen" open fullscreen>
     <template #header>
-      <h2 class="font-bold">{{ t('webBrowsing.title') }}</h2>
-      <p class="text-sm text-gray-500">
-        {{ t('webBrowsing.description') }}
-        <br />
-        {{ t('webBrowsing.clickToView') }}
-      </p>
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="font-bold">{{ t('webBrowsing.title') }}</h2>
+          <p class="text-sm text-gray-500">
+            {{ t('webBrowsing.clickToView') }}
+          </p>
+        </div>
+        <UButton
+          icon="i-heroicons-arrows-pointing-out"
+          :variant="isFullscreen ? 'solid' : 'ghost'"
+          :color="isFullscreen ? 'primary' : 'info'"
+          @click="toggleFullscreen"
+        />
+      </div>
+    </template>
+
+    <template #body>
+      <div :class="['flex h-full', !isLargeScreen && 'flex-col']">
+        <div class="flex-1">
+          <SearchFlow
+            ref="flowRef"
+            v-model:nodes="flowNodes"
+            v-model:edges="flowEdges"
+            :selected-node-id="selectedNodeId"
+            fullscreen
+            @node-click="selectNode"
+          />
+        </div>
+        <div
+          v-if="selectedNode"
+          :class="[
+            'border-gray-200',
+            isLargeScreen
+              ? 'border-l w-1/3 pl-4 sm:pl-6'
+              : 'h-1/2 overflow-y-scroll',
+          ]"
+        >
+          <NodeDetail :node="selectedNode" @retry="retryNode" />
+        </div>
+      </div>
+    </template>
+  </UModal>
+
+  <UCard v-if="!isFullscreen">
+    <template #header>
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="font-bold">{{ t('webBrowsing.title') }}</h2>
+          <p class="text-sm text-gray-500">
+            {{ t('webBrowsing.description') }}
+            <br />
+            {{ t('webBrowsing.clickToView') }}
+          </p>
+        </div>
+        <UButton
+          icon="i-heroicons-arrows-pointing-out"
+          variant="ghost"
+          color="info"
+          @click="toggleFullscreen"
+        />
+      </div>
     </template>
     <div class="flex flex-col">
       <SearchFlow
         ref="flowRef"
+        v-model:nodes="flowNodes"
+        v-model:edges="flowEdges"
         :selected-node-id="selectedNodeId"
         @node-click="selectNode"
       />

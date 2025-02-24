@@ -13,7 +13,7 @@
 </script>
 
 <template>
-  <div class="p-4">
+  <div>
     <USeparator :label="$t('webBrowsing.nodeDetails')" />
     <UAlert
       v-if="node.error"

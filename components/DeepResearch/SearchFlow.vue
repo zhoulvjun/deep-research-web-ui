@@ -9,6 +9,7 @@
     type Node,
     VueFlow,
     useVueFlow,
+    getNodesInside,
   } from '@vue-flow/core'
   import { Background } from '@vue-flow/background'
   import { Controls } from '@vue-flow/controls'
@@ -25,43 +26,55 @@
     (e: 'node-click', nodeId: string): void
   }>()
 
-  defineProps<{
+  const props = defineProps<{
     selectedNodeId?: string
+    fullscreen?: boolean
   }>()
 
-  const isLargeScreen = useMediaQuery('(min-width: 768px)')
-  const defaultPosition = { x: 0, y: 0 }
-  const nodes = ref<SearchNode[]>([defaultRootNode()])
-  const edges = ref<SearchEdge[]>([])
-  let hasUserInteraction = false
+  const nodes = defineModel<SearchNode[]>('nodes', { required: true })
+  const edges = defineModel<SearchEdge[]>('edges', { required: true })
 
+  const isLargeScreen = useMediaQuery('(min-width: 768px)')
   const {
     addNodes: addFlowNodes,
     addEdges: addFlowEdges,
     updateNodeData: updateFlowNodeData,
     fitView,
+    viewport,
+    vueFlowRef,
   } = useVueFlow()
   const { layout } = useNodeLayout()
 
-  function defaultRootNode(): SearchNode {
-    return {
-      id: '0',
-      data: { title: 'Start' },
-      position: { ...defaultPosition },
-      type: 'search', // We only have this type
-    }
-  }
+  let hasUserInteraction = false
 
   function handleNodeClick(nodeId: string) {
     emit('node-click', nodeId)
   }
 
-  function layoutGraph() {
+  function layoutGraph(force = false) {
     nodes.value = layout(nodes.value, edges.value)
-    if (!hasUserInteraction) {
-      nextTick(() => {
-        fitView({})
-      })
+    if (!hasUserInteraction || force) {
+      // Wait a bit for the viewport to update after resize
+      setTimeout(() => {
+        // If a node is selected and is outside the viewport, move it to the viewport
+        if (props.selectedNodeId) {
+          const rect = vueFlowRef.value?.getBoundingClientRect()
+          if (!rect) return
+
+          const nodesInViewport = getNodesInside(
+            // @ts-ignore
+            nodes.value,
+            rect,
+            viewport.value,
+          )
+
+          if (!nodesInViewport.some((n) => n.id === props.selectedNodeId)) {
+            fitView({ nodes: [props.selectedNodeId], maxZoom: 1.3 })
+          }
+        } else {
+          fitView({ maxZoom: 1.4 })
+        }
+      }, 10)
     }
   }
 
@@ -69,7 +82,7 @@
     addFlowNodes({
       id: nodeId,
       data,
-      position: { ...defaultPosition },
+      position: { ...{ x: 0, y: 0 } },
       type: 'search',
     })
 
@@ -89,9 +102,8 @@
     layoutGraph()
   }
 
-  function clearNodes() {
-    nodes.value = [defaultRootNode()]
-    edges.value = []
+  function reset() {
+    console.warn('reset')
     layoutGraph()
     hasUserInteraction = false
   }
@@ -123,14 +135,15 @@
   defineExpose({
     addNode,
     updateNode,
-    clearNodes,
+    reset,
     removeChildNodes,
+    layoutGraph,
   })
 </script>
 
 <template>
   <ClientOnly fallback-tag="span" fallback="Loading graph...">
-    <div :class="[isLargeScreen ? 'h-100' : 'h-60']">
+    <div :class="[fullscreen ? 'h-full' : isLargeScreen ? 'h-100' : 'h-60']">
       <VueFlow
         v-model:nodes="nodes"
         v-model:edges="edges"

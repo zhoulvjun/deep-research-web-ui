@@ -4,7 +4,6 @@
     type PartialProcessedSearchResult,
     type ResearchStep,
   } from '~/lib/deep-research'
-  import { marked } from 'marked'
   import {
     feedbackInjectionKey,
     formInjectionKey,
@@ -12,6 +11,7 @@
   } from '~/constants/injection-keys'
   import Flow from './SearchFlow.vue'
   import SearchFlow from './SearchFlow.vue'
+  import NodeDetail from './NodeDetail.vue'
   import { isChildNode, isParentNode, isRootNode } from '~/utils/tree-node'
 
   export type DeepResearchNodeStatus = Exclude<ResearchStep['type'], 'complete'>
@@ -319,112 +319,12 @@
       </p>
     </template>
     <div class="flex flex-col">
-      <div class="overflow-y-auto">
-        <SearchFlow
-          ref="flowRef"
-          :selected-node-id="selectedNodeId"
-          @node-click="selectNode"
-        />
-      </div>
-      <div v-if="selectedNode" class="p-4">
-        <USeparator :label="$t('webBrowsing.nodeDetails')" />
-        <UAlert
-          v-if="selectedNode.error"
-          class="my-2"
-          :title="$t('webBrowsing.nodeFailed')"
-          :description="selectedNode.error"
-          color="error"
-          variant="soft"
-          :duration="8000"
-          :actions="[{
-            label: $t('webBrowsing.retry'),
-            color: 'secondary',
-            onClick: () => retryNode(selectedNode!.id),
-          }]"
-        />
-        <h2 class="text-xl font-bold my-2">
-          {{ selectedNode.label ?? $t('webBrowsing.generating') }}
-        </h2>
-
-        <!-- Research goal -->
-        <h3 class="text-lg font-semibold mt-2">
-          {{ t('webBrowsing.researchGoal') }}
-        </h3>
-        <!-- Root node has no additional information -->
-        <p v-if="isRootNode(selectedNode.id)">
-          {{ t('webBrowsing.startNode.description') }}
-        </p>
-        <p
-          v-if="selectedNode.researchGoal"
-          class="prose max-w-none dark:prose-invert"
-          v-html="marked(selectedNode.researchGoal, { gfm: true })"
-        />
-
-        <!-- Visited URLs -->
-        <h3 class="text-lg font-semibold mt-2">
-          {{ t('webBrowsing.visitedUrls') }}
-        </h3>
-        <ul
-          v-if="selectedNode.searchResults?.length"
-          class="list-disc list-inside"
-        >
-          <li
-            v-for="(item, index) in selectedNode.searchResults"
-            class="whitespace-pre-wrap break-all"
-            :key="index"
-          >
-            <UButton
-              class="!p-0 contents"
-              variant="link"
-              :href="item.url"
-              target="_blank"
-            >
-              {{ item.title || item.url }}
-            </UButton>
-          </li>
-        </ul>
-        <span v-else> - </span>
-
-        <!-- Learnings -->
-        <h3 class="text-lg font-semibold mt-2">
-          {{ t('webBrowsing.learnings') }}
-        </h3>
-
-        <ReasoningAccordion
-          v-if="selectedNode.generateLearningsReasoning"
-          v-model="selectedNode.generateLearningsReasoning"
-          class="my-2"
-          :loading="
-            selectedNode.status === 'processing_serach_result_reasoning' ||
-            selectedNode.status === 'processing_serach_result'
-          "
-        />
-        <p
-          v-for="(learning, index) in selectedNode.learnings"
-          class="prose max-w-none dark:prose-invert"
-          :key="index"
-          v-html="marked(`- ${learning}`, { gfm: true })"
-        />
-        <span v-if="!selectedNode.learnings?.length"> - </span>
-
-        <!-- Follow up questions -->
-        <!-- Only show if there is reasoning content. Otherwise the follow-ups are basically just child nodes. -->
-        <template v-if="selectedNode.generateQueriesReasoning">
-          <h3 class="text-lg font-semibold my-2">
-            {{ t('webBrowsing.followUpQuestions') }}
-          </h3>
-
-          <!-- Set loading default to true, because currently don't know how to handle it otherwise -->
-          <ReasoningAccordion
-            v-if="selectedNode.generateQueriesReasoning"
-            v-model="selectedNode.generateQueriesReasoning"
-            :loading="
-              selectedNode.status === 'generating_query_reasoning' ||
-              selectedNode.status === 'generating_query'
-            "
-          />
-        </template>
-      </div>
+      <SearchFlow
+        ref="flowRef"
+        :selected-node-id="selectedNodeId"
+        @node-click="selectNode"
+      />
+      <NodeDetail v-if="selectedNode" :node="selectedNode" @retry="retryNode" />
     </div>
   </UCard>
 </template>

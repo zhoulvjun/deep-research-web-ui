@@ -201,6 +201,7 @@
         <UButton
           icon="i-lucide-refresh-cw"
           :loading
+          :disabled="!reasoningContent && !reportContent && !error"
           variant="ghost"
           @click="generateReport"
         >

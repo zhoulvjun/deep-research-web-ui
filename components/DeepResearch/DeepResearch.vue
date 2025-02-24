@@ -380,7 +380,7 @@
         <div
           v-if="selectedNode"
           :class="[
-            'border-gray-200',
+            'border-gray-100 dark:border-gray-800',
             isLargeScreen
               ? 'border-l w-1/3 pl-4 sm:pl-6'
               : 'h-1/2 overflow-y-scroll',

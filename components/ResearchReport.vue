@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import printJS from 'print-js'
   import { marked } from 'marked'
   import { writeFinalReport } from '~/lib/deep-research'
   import {
@@ -33,6 +32,8 @@
       loadingExportPdf.value ||
       loadingExportMarkdown.value,
   )
+
+  let printJS: typeof import('print-js') | undefined
 
   async function generateReport() {
     loading.value = true
@@ -87,6 +88,10 @@
     })
     // Wait after title is changed
     await new Promise((r) => setTimeout(r, 100))
+
+    if (!printJS) {
+      printJS = (await import('print-js')).default
+    }
 
     printJS({
       printable: reportHtml.value,

@@ -126,7 +126,7 @@ export function generateSearchQueries({
     system: systemPrompt(),
     prompt,
     onError({ error }) {
-      throw error
+      throwAiError('generateSearchQueries', error)
     },
   })
 }
@@ -174,7 +174,7 @@ function processSearchResult({
     system: systemPrompt(),
     prompt,
     onError({ error }) {
-      throw error
+      throwAiError('processSearchResult', error)
     },
   })
 }
@@ -204,7 +204,7 @@ export function writeFinalReport({
     system: systemPrompt(),
     prompt: _prompt,
     onError({ error }) {
-      throw error
+      throwAiError('writeFinalReport', error)
     },
   })
 }

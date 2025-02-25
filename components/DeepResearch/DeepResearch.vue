@@ -40,6 +40,7 @@
 
   const toast = useToast()
   const { t, locale } = useI18n()
+  const { config } = useConfigStore()
   const isLargeScreen = useMediaQuery('(min-width: 768px)')
 
   const flowRef = ref<InstanceType<typeof Flow>>()
@@ -278,6 +279,7 @@
         breadth,
         maxDepth: form.value.depth,
         languageCode: locale.value,
+        searchLanguageCode: config.webSearch.searchLanguage,
         learnings: existingLearnings,
         visitedUrls: existingVisitedUrls,
         onProgress: handleResearchProgress,

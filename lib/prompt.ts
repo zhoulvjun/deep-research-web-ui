@@ -23,8 +23,7 @@ export const languagePrompt = (language: string) => {
   let languagePrompt = `Respond in ${language}.`
 
   if (language === '中文') {
-    languagePrompt +=
-      ' Add appropriate spaces between Chinese characters and Latin characters/numbers (e.g., "使用Vue组件" -> "使用 Vue 组件", "深度为3" -> "深度为 3"), but do not add spaces between Chinese characters themselves.'
+    languagePrompt += ' 在中文和英文之间添加适当的空格来提升可读性'
   }
   return languagePrompt
 }

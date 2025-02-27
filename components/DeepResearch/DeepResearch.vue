@@ -2,6 +2,7 @@
   import {
     deepResearch,
     type PartialProcessedSearchResult,
+    type ProcessedSearchResult,
     type ResearchStep,
   } from '~/lib/deep-research'
   import {
@@ -29,7 +30,7 @@
     generateLearningsReasoning?: string
     searchResults?: WebSearchResult[]
     /** Learnings from search results */
-    learnings?: string[]
+    learnings?: ProcessedSearchResult['learnings']
     status?: DeepResearchNodeStatus
     error?: string
   }
@@ -197,7 +198,6 @@
         console.log(`[DeepResearch] complete:`, step)
         completeResult.value = {
           learnings: step.learnings,
-          visitedUrls: step.visitedUrls,
         }
         emit('complete')
         isLoading.value = false
@@ -246,8 +246,7 @@
 
     try {
       let query = getCombinedQuery(form.value, feedback.value)
-      let existingLearnings: string[] = []
-      let existingVisitedUrls: string[] = []
+      let existingLearnings: ProcessedSearchResult['learnings'] = []
       let currentDepth = 1
       let breadth = form.value.breadth
 
@@ -266,10 +265,6 @@
         existingLearnings = parentNodes
           .flatMap((n) => n.learnings || [])
           .filter(Boolean)
-        existingVisitedUrls = parentNodes
-          .flatMap((n) => n.searchResults || [])
-          .map((r) => r.url)
-          .filter(Boolean)
       }
 
       await deepResearch({
@@ -281,7 +276,6 @@
         languageCode: locale.value,
         searchLanguageCode: config.webSearch.searchLanguage,
         learnings: existingLearnings,
-        visitedUrls: existingVisitedUrls,
         onProgress: handleResearchProgress,
       })
     } catch (error) {

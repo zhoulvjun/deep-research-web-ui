@@ -88,7 +88,7 @@
       v-for="(learning, index) in node.learnings"
       class="prose max-w-none dark:prose-invert break-words"
       :key="index"
-      v-html="marked(`- ${learning}`, { gfm: true })"
+      v-html="marked(`- ${learning.learning}`, { gfm: true })"
     />
     <span v-if="!node.learnings?.length"> - </span>
 

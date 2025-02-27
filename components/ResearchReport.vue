@@ -16,15 +16,13 @@
   const loadingExportMarkdown = ref(false)
   const reasoningContent = ref('')
   const reportContent = ref('')
+  const reportContainerRef = ref<HTMLElement>()
 
   // Inject global data from index.vue
   const form = inject(formInjectionKey)!
   const feedback = inject(feedbackInjectionKey)!
   const researchResult = inject(researchResultInjectionKey)!
 
-  const reportHtml = computed(() =>
-    marked(reportContent.value, { silent: true, gfm: true, breaks: true }),
-  )
   const isExportButtonDisabled = computed(
     () =>
       !reportContent.value ||
@@ -32,6 +30,116 @@
       loadingExportPdf.value ||
       loadingExportMarkdown.value,
   )
+
+  const reportHtml = computed(() => {
+    let html = marked(reportContent.value, {
+      silent: true,
+      gfm: true,
+      breaks: true,
+      async: false,
+    })
+
+    const learnings = researchResult.value?.learnings ?? []
+
+    // 替换引用标记 [数字] 为带有工具提示的 span
+    html = html.replace(/\[(\d+)\]/g, (match, number) => {
+      const index = parseInt(number) - 1
+      const learning =
+        index >= 0 && index < learnings.length ? learnings[index] : ''
+      if (!learning) return match
+      // 使用唯一的 ID 来标识每个 tooltip
+      const tooltipId = `tooltip-${index}`
+
+      return `<span class="citation-ref" data-tooltip-id="${tooltipId}" data-tooltip-url="${
+        learning.url
+      }" data-tooltip-content="${encodeURIComponent(
+        learning.title || learning.url,
+      )}">
+        <a href="${learning.url}" target="_blank">${match}</a>
+      </span>`
+    })
+
+    return `<style>
+        .citation-ref {
+          display: inline-block;
+          vertical-align: super;
+          font-size: 0.75rem;
+          font-weight: 500;
+          color: #3b82f6;
+        }
+        .citation-ref a {
+          text-decoration: none;
+          color: inherit;
+        }
+      </style>
+      ${html}`
+  })
+
+  // 在 DOM 更新后设置 tooltip 事件监听
+  onMounted(() => {
+    nextTick(() => {
+      setupTooltips()
+    })
+  })
+
+  // 监听报告内容变化，重新设置 tooltip
+  watch(reportContent, () => {
+    nextTick(() => {
+      setupTooltips()
+    })
+  })
+
+  // 设置 tooltip 事件监听
+  function setupTooltips() {
+    if (!reportContainerRef.value) return
+
+    // 移除现有的 tooltip 元素
+    document.querySelectorAll('.citation-tooltip').forEach((el) => el.remove())
+
+    // 创建一个通用的 tooltip 元素
+    const tooltip = document.createElement('div')
+    tooltip.className =
+      'citation-tooltip fixed px-2 py-1 bg-gray-800 text-white text-xs rounded z-50 opacity-0 transition-opacity duration-200 max-w-[calc(100vw-2rem)] overflow-hidden text-ellipsis pointer-events-none'
+    document.body.appendChild(tooltip)
+
+    // 为所有引用添加鼠标事件
+    const refs = reportContainerRef.value.querySelectorAll('.citation-ref')
+    refs.forEach((ref) => {
+      ref.addEventListener('mouseenter', (e) => {
+        const target = e.currentTarget as HTMLElement
+        const content = decodeURIComponent(target.dataset.tooltipContent || '')
+
+        // 设置 tooltip 内容
+        tooltip.textContent = content
+        tooltip.style.opacity = '1'
+
+        // 计算位置
+        const rect = target.getBoundingClientRect()
+        const tooltipRect = tooltip.getBoundingClientRect()
+
+        // 默认显示在引用上方
+        let top = rect.top - tooltipRect.height - 8
+        let left = rect.left + rect.width / 2
+
+        // 如果 tooltip 会超出顶部，则显示在下方
+        if (top < 10) {
+          top = rect.bottom + 8
+        }
+
+        // 确保 tooltip 不会超出左右边界
+        const maxLeft = window.innerWidth - tooltipRect.width - 10
+        const minLeft = 10
+        left = Math.min(Math.max(left, minLeft), maxLeft)
+
+        tooltip.style.top = `${top}px`
+        tooltip.style.left = `${left}px`
+      })
+
+      ref.addEventListener('mouseleave', () => {
+        tooltip.style.opacity = '0'
+      })
+    })
+  }
 
   let printJS: typeof import('print-js') | undefined
 
@@ -42,8 +150,8 @@
     reasoningContent.value = ''
     try {
       // Store a copy of the data
-      const visitedUrls = researchResult.value.visitedUrls ?? []
-      const learnings = researchResult.value.learnings ?? []
+      const learnings = [...researchResult.value.learnings]
+      console.log(`[generateReport] Generating report. Learnings:`, learnings)
       const { fullStream } = writeFinalReport({
         prompt: getCombinedQuery(form.value, feedback.value),
         language: t('language', {}, { locale: locale.value }),
@@ -64,7 +172,12 @@
       }
       reportContent.value += `\n\n## ${t(
         'researchReport.sources',
-      )}\n\n${visitedUrls.map((url) => `- ${url}`).join('\n')}`
+      )}\n\n${learnings
+        .map(
+          (item, index) =>
+            `${index + 1}. [${item.title || item.url}](${item.url})`,
+        )
+        .join('\n')}`
     } catch (e: any) {
       console.error(`Generate report failed`, e)
       error.value = t('researchReport.generateFailed', [e.message])
@@ -126,11 +239,14 @@
 
     loadingExportMarkdown.value = true
     try {
+      // 使用原始的 Markdown 内容，它已经包含了 [1], [2] 等引用角标
       const blob = new Blob([reportContent.value], { type: 'text/markdown' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = 'research-report.md'
+      a.download = `research-report-${
+        new Date().toISOString().split('T')[0]
+      }.md`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
@@ -157,7 +273,6 @@
         <UButton
           icon="i-lucide-refresh-cw"
           :loading
-          :disabled="!reasoningContent && !reportContent && !error"
           variant="ghost"
           @click="generateReport"
         >
@@ -207,6 +322,7 @@
     />
 
     <div
+      ref="reportContainerRef"
       v-if="reportContent"
       class="prose prose-sm max-w-none break-words p-6 bg-gray-50 dark:bg-gray-800 dark:prose-invert dark:text-white rounded-lg shadow"
       v-html="reportHtml"

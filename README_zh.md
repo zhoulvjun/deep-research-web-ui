@@ -12,15 +12,22 @@
 
 当前支持的供应商：
 
-
 - AI 服务：OpenAI compatible, SiliconFlow, DeepSeek, OpenRouter, Ollama 等
 - 联网搜索服务：Tavily (每月 1000 次免费搜索), Firecrawl（支持自部署）
 
 喜欢本项目请点 ⭐ 收藏！
 
- <video width="500" src="https://github.com/user-attachments/assets/8f9baa43-a74e-4613-aebb-1bcc29a686f0" controls></video>
+<video width="500" src="https://github.com/user-attachments/assets/8f9baa43-a74e-4613-aebb-1bcc29a686f0" controls></video>
 
 ## 近期更新
+
+25/02/27
+
+- 新增：研究报告中新增了来源引用信息
+- 改进：改善了中文的输出格式
+- 改进：在“研究主题”表单中开放了更高的“深度”和“广度”（也可以手动填入更大的值）
+- 修复：修复了搜索节点详情可能出现文字溢出的问题
+- 其它：界面样式改进
 
 25/02/24
 
@@ -51,15 +58,15 @@
 - 使用 VueFlow 重构了搜索可视化功能
 - 一些样式和 bug 修复
 
+<details>
+<summary>早期更新</summary>
+
 25/02/15
 
 - AI 提供商支持 DeepSeek，OpenRouter 和 Ollama，联网搜索支持 Firecrawl
 - 支持检查项目更新
 - 支持重新生成报告
 - 一般性优化和改进
-
-<details>
-<summary>早期更新</summary>
 
 25/02/14
 

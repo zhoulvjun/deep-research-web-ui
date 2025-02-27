@@ -24,6 +24,14 @@ Please give a 🌟 Star if you like this project!
 
 ## Recent updates
 
+25/02/27
+
+- Added: Citations in research report
+- Improved: Chinese output layout
+- Improved: Increased max width and breadth in the form
+- Fixed: Text overflow issues for web search node details
+- Fixed: general UI style issues
+
 25/02/24
 
 - Added: Fullscreen mode for the search flow. This helps you to focus on the search process better.
@@ -53,15 +61,15 @@ Please give a 🌟 Star if you like this project!
 - Refactored the search visualization using VueFlow
 - Style & bug fixes
 
+<details>
+<summary>Older updates</summary>
+
 25/02/15
 
 - Added AI providers DeepSeek, OpenRouter and Ollama; Added web search provider Firecrawl
 - Supported checking project updates
 - Supported regenerating reports
 - General fixes
-
-<details>
-<summary>Older updates</summary>
 
 25/02/14
 

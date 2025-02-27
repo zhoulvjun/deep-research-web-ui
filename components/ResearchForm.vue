@@ -69,7 +69,7 @@
             class="w-full"
             type="number"
             :min="1"
-            :max="5"
+            :max="8"
             :step="1"
           />
         </UFormField>
@@ -81,7 +81,7 @@
             class="w-full"
             type="number"
             :min="1"
-            :max="5"
+            :max="8"
             :step="1"
           />
         </UFormField>

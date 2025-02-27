@@ -44,7 +44,7 @@
     </p>
     <p
       v-if="node.researchGoal"
-      class="prose max-w-none dark:prose-invert"
+      class="prose max-w-none dark:prose-invert break-words"
       v-html="marked(node.researchGoal, { gfm: true })"
     />
 
@@ -86,7 +86,7 @@
     />
     <p
       v-for="(learning, index) in node.learnings"
-      class="prose max-w-none dark:prose-invert"
+      class="prose max-w-none dark:prose-invert break-words"
       :key="index"
       v-html="marked(`- ${learning}`, { gfm: true })"
     />

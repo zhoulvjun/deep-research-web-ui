@@ -84,12 +84,13 @@
         node.status === 'processing_serach_result'
       "
     />
-    <p
-      v-for="(learning, index) in node.learnings"
-      class="prose max-w-none dark:prose-invert break-words"
-      :key="index"
-      v-html="marked(`- ${learning.learning}`, { gfm: true })"
-    />
+    <template v-for="({ learning }, index) in node.learnings" :key="index">
+      <p
+        v-if="learning"
+        class="prose max-w-none dark:prose-invert break-words"
+        v-html="marked(`- ${learning}`, { gfm: true })"
+      ></p>
+    </template>
     <span v-if="!node.learnings?.length"> - </span>
 
     <!-- Follow up questions -->

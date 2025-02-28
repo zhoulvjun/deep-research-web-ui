@@ -1,13 +1,14 @@
 import { streamText } from 'ai'
 import { z } from 'zod'
-import { parseStreamingJson, type DeepPartial } from '~/utils/json'
+import { parseStreamingJson, type DeepPartial } from '~~/utils/json'
 
 import { trimPrompt } from './ai/providers'
 import { languagePrompt, systemPrompt } from './prompt'
 import zodToJsonSchema from 'zod-to-json-schema'
-import { useAiModel } from '~/composables/useAiProvider'
-import type { Locale } from '~/components/LangSwitcher.vue'
-import type { DeepResearchNode } from '~/components/DeepResearch/DeepResearch.vue'
+import { useAiModel } from '@/composables/useAiProvider'
+import type { Locale } from '@/components/LangSwitcher.vue'
+import type { DeepResearchNode } from '@/components/DeepResearch/DeepResearch.vue'
+import { throwAiError } from '~~/utils/errors'
 
 export type ResearchResult = {
   learnings: ProcessedSearchResult['learnings']
@@ -185,7 +186,7 @@ function processSearchResult({
     `<contents>${contents
       .map(
         (content, index) =>
-          `<content url="${results[index].url}">\n${content}\n</content>`,
+          `<content url="${results[index]!.url}">\n${content}\n</content>`,
       )
       .join('\n')}</contents>`,
     `You MUST respond in JSON matching this JSON schema: ${jsonSchema}`,
@@ -316,8 +317,8 @@ export async function deepResearch({
           for (let i = 0; i < searchQueries.length; i++) {
             onProgress({
               type: 'generating_query',
-              result: searchQueries[i],
-              nodeId: searchQueries[i].nodeId,
+              result: searchQueries[i]!,
+              nodeId: searchQueries[i]!.nodeId,
               parentNodeId: nodeId,
             })
           }

@@ -3,7 +3,7 @@
     feedbackInjectionKey,
     formInjectionKey,
   } from '~/constants/injection-keys'
-  import { generateFeedback } from '~/lib/feedback'
+  import { generateFeedback } from '~~/lib/feedback'
 
   export interface ResearchFeedbackResult {
     assistantQuestion: string
@@ -69,10 +69,10 @@
           // Incrementally update modelValue
           for (let i = 0; i < questions.length; i += 1) {
             if (feedback.value[i]) {
-              feedback.value[i].assistantQuestion = questions[i]
+              feedback.value[i]!.assistantQuestion = questions[i]!
             } else {
               feedback.value.push({
-                assistantQuestion: questions[i],
+                assistantQuestion: questions[i]!,
                 userAnswer: '',
               })
             }

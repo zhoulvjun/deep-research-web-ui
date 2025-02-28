@@ -4,7 +4,7 @@
     type PartialProcessedSearchResult,
     type ProcessedSearchResult,
     type ResearchStep,
-  } from '~/lib/deep-research'
+  } from '~~/lib/deep-research'
   import {
     feedbackInjectionKey,
     formInjectionKey,

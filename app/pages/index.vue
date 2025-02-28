@@ -51,19 +51,19 @@
 </template>
 
 <script setup lang="ts">
-  import type ResearchForm from '~/components/ResearchForm.vue'
-  import type ResearchFeedback from '~/components/ResearchFeedback.vue'
-  import type DeepResearch from '~/components/DeepResearch/DeepResearch.vue'
-  import type ResearchReport from '~/components/ResearchReport.vue'
-  import type ConfigManager from '~/components/ConfigManager.vue'
-  import type { ResearchInputData } from '~/components/ResearchForm.vue'
-  import type { ResearchFeedbackResult } from '~/components/ResearchFeedback.vue'
-  import type { ResearchResult } from '~/lib/deep-research'
+  import type ResearchForm from '@/components/ResearchForm.vue'
+  import type ResearchFeedback from '@/components/ResearchFeedback.vue'
+  import type DeepResearch from '@/components/DeepResearch/DeepResearch.vue'
+  import type ResearchReport from '@/components/ResearchReport.vue'
+  import type ConfigManager from '@/components/ConfigManager.vue'
+  import type { ResearchInputData } from '@/components/ResearchForm.vue'
+  import type { ResearchFeedbackResult } from '@/components/ResearchFeedback.vue'
+  import type { ResearchResult } from '~~/lib/deep-research'
   import {
     feedbackInjectionKey,
     formInjectionKey,
     researchResultInjectionKey,
-  } from '~/constants/injection-keys'
+  } from '@/constants/injection-keys'
 
   const version = useRuntimeConfig().public.version
 
@@ -82,7 +82,6 @@
   const feedback = ref<ResearchFeedbackResult[]>([])
   const researchResult = ref<ResearchResult>({
     learnings: [],
-    visitedUrls: [],
   })
 
   provide(formInjectionKey, form)

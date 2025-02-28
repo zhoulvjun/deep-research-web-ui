@@ -2,7 +2,7 @@
   import { useIntervalFn } from '@vueuse/core'
   // @ts-expect-error
   import semverGt from 'semver/functions/gt'
-  import type VersionMeta from '~/public/version.json'
+  import type VersionMeta from '~~/public/version.json'
 
   const { t } = useI18n()
   const toast = useToast()

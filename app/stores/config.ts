@@ -1,5 +1,5 @@
 import { skipHydrate } from 'pinia'
-import type { Locale } from '~/components/LangSwitcher.vue'
+import type { Locale } from '@/components/LangSwitcher.vue'
 
 export type ConfigAiProvider =
   | 'openai-compatible'

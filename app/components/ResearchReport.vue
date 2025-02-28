@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { marked } from 'marked'
-  import { writeFinalReport } from '~/lib/deep-research'
+  import { writeFinalReport } from '~~/lib/deep-research'
   import {
     feedbackInjectionKey,
     formInjectionKey,

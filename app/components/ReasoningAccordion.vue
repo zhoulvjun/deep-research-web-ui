@@ -44,7 +44,9 @@ until modelValue's length > 0 -->
       </div>
     </template>
     <template #content="{ item }">
-      <p class="text-sm text-gray-500 dark:text-gray-400 whitespace-pre-wrap mb-4">
+      <p
+        class="text-sm text-gray-500 dark:text-gray-400 whitespace-pre-wrap mb-4"
+      >
         {{ item.content }}
       </p>
     </template>

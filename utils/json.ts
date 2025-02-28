@@ -76,7 +76,9 @@ export async function* parseStreamingJson<T extends z.ZodType>(
 
   // If the last chunk parses failed, return an error
   if (!isParseSuccessful) {
-    console.warn(`[parseStreamingJson] Failed to parse JSON: ${removeJsonMarkdown(rawText)}`)
+    console.warn(
+      `[parseStreamingJson] Failed to parse JSON: ${removeJsonMarkdown(rawText)}`,
+    )
     yield {
       type: 'bad-end',
       rawText,

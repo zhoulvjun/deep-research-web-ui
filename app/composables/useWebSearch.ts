@@ -31,8 +31,8 @@ export const useWebSearch = (): WebSearchFunction => {
         const results = await fc.search(q, {
           ...o,
           scrapeOptions: {
-            formats: ['markdown']
-          }
+            formats: ['markdown'], // TODO: verify if this actually works
+          },
         })
         if (results.error) {
           throw new Error(results.error)

@@ -48,20 +48,12 @@
       // Only kept for easy reference in i18n Ally
       _help: t('settings.ai.providers.siliconflow.description'),
       value: 'siliconflow',
-      link: 'https://cloud.siliconflow.cn/i/J0NHrrX8',
+      link: 'https://cloud.siliconflow.cn/i/NtgeJ0t6',
       linkText: 'cloud.siliconflow.cn',
     },
     {
       label: 'DeepSeek',
       value: 'deepseek',
-    },
-    {
-      label: 'OpenRouter',
-      value: 'openrouter',
-    },
-    {
-      label: 'Ollama',
-      value: 'ollama',
     },
   ])
   const webSearchProviderOptions = computed(() => [

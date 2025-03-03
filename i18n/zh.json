@@ -4,7 +4,7 @@
   "modelThinkingComplete": "思考完毕",
   "invalidStructuredOutput": "模型返回的内容无效或不完整，无法解析。请尝试换一个更大或者更“聪明”的模型。",
   "index": {
-    "projectDescription": "Deep Research 是 {0} 的可视化 UI，可以让 AI 根据特定问题联网搜索并自行深挖，并输出研究报告。\n本项目可以流式传输 AI 的回答来实时反馈，并使用树状结构可视化搜索过程。\n全部 API 请求都在浏览器本地完成。",
+    "projectDescription": "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;中华女子学院图书馆“迎两会，庆三八”特推出深度研究报告自动生成系统，已成功接入满血版DeepSeek-R1推理大模型，可以让 AI 根据特定问题联网搜索并自行深挖，输出研究报告。本系统可以流式传输 AI 的回答来实时反馈，并使用树状结构可视化搜索过程。",
     "missingConfigTitle": "需要配置 API",
     "missingConfigDescription": "本项目需要您自备 AI 和联网搜索服务的配置 (Bring Your Own Key)"
   },

@@ -36,13 +36,6 @@
   ])
   const aiProviderOptions = computed(() => [
     {
-      label: t('settings.ai.providers.openaiCompatible.title'),
-      help: 'settings.ai.providers.openaiCompatible.description',
-      // Only kept for easy reference in i18n Ally
-      _help: t('settings.ai.providers.openaiCompatible.description'),
-      value: 'openai-compatible',
-    },
-    {
       label: t('settings.ai.providers.siliconflow.title'),
       help: 'settings.ai.providers.siliconflow.description',
       // Only kept for easy reference in i18n Ally
@@ -50,6 +43,13 @@
       value: 'siliconflow',
       link: 'https://cloud.siliconflow.cn/i/NtgeJ0t6',
       linkText: 'cloud.siliconflow.cn',
+    },
+    {
+      label: t('settings.ai.providers.openaiCompatible.title'),
+      help: 'settings.ai.providers.openaiCompatible.description',
+      // Only kept for easy reference in i18n Ally
+      _help: t('settings.ai.providers.openaiCompatible.description'),
+      value: 'openai-compatible',
     },
     {
       label: 'DeepSeek',

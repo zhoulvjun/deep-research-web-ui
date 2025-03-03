@@ -20,13 +20,13 @@
       "contextSize": "上下文长度",
       "contextSizeHelp": "发送给模型的最大 token 数量，不能超过模型本身支持的上下文长度。",
       "providers": {
-        "openaiCompatible": {
-          "title": "OpenAI Compatible",
-          "description": "任意兼容 OpenAI 接口格式的供应商。\n注：为了改进兼容性，部分供应商有单独的选项，请展开查看。"
-        },
         "siliconflow": {
           "title": "SiliconFlow 硅基流动",
           "description": "注册赠送 ¥14 元免费额度。在 {0} 生成一个 API key。"
+        },
+        "openaiCompatible": {
+          "title": "OpenAI Compatible",
+          "description": "任意兼容 OpenAI 接口格式的供应商。\n注：为了改进兼容性，部分供应商有单独的选项，请展开查看。"
         }
       }
     },

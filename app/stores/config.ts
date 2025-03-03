@@ -2,11 +2,9 @@ import { skipHydrate } from 'pinia'
 import type { Locale } from '@/components/LangSwitcher.vue'
 
 export type ConfigAiProvider =
-  | 'openai-compatible'
   | 'siliconflow'
-  | 'openrouter'
+  | 'openai-compatible'
   | 'deepseek'
-  | 'ollama'
 
 export type ConfigWebSearchProvider = 'tavily' | 'firecrawl'
 

@@ -52,9 +52,9 @@ function validateConfig(config: Config) {
 export const useConfigStore = defineStore('config', () => {
   const config = useLocalStorage<Config>('deep-research-config', {
     ai: {
-      provider: 'openai-compatible',
-      model: '',
-      contextSize: 128_000,
+      provider: 'siliconflow',
+      model: 'deepseek-ai/DeepSeek-R1',
+      contextSize: 64_000,
     },
     webSearch: {
       provider: 'tavily',
